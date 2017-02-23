@@ -55,7 +55,7 @@ public class PokemonDataCreator {
         int helperDef = basePokemon.getBaseDefense() + ivDefense;
         int helperSta = basePokemon.getBaseStamina() + ivStamina;
         double maxCpM = Math.sqrt((10*maxCp)/(helperAtt*Math.sqrt(helperDef)*Math.sqrt(helperSta)));
-        while(maxCpM < gameMaster.getCpMultiplierTable().get(retVal)){
+        while(maxCpM < gameMaster.getCpMultiplierTable().get(retVal) && retVal > 10){
           retVal -=5;
         }
         //System.out.println("Pokemon: " + basePokemon.getName() + ". MaxCp: " +maxCp + ". Level: " + retVal);
