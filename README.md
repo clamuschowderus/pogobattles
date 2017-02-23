@@ -1,0 +1,2 @@
+# pogobattles
+pokebattler simulations generator
