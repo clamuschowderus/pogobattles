@@ -29,7 +29,7 @@ pogobattles.ranking.RankingsCalculator has a few methods that take different par
 
 calculateAll methods listed below will pitch all attackers in the movesets List against the defenders in the defenders List at a specified attacker and defender level. Fields are similar to described above for the calculateAllPrestige methods.
 
-  public static void calculateAll(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int attLevel, int defLevel);
-  public static void calculateAll(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int ivAtt, int ivDef, int ivSta, int attLevel, int defIvAtt, int defIvDef, int defIvSta, int defLevel);
+- public static void calculateAll(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int attLevel, int defLevel);
+- public static void calculateAll(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int ivAtt, int ivDef, int ivSta, int attLevel, int defIvAtt, int defIvDef, int defIvSta, int defLevel);
 
 Sorry for the overall horrible quality of the code. I vomited this code in record time. I'll try to come back and make it a bit more user friendly. That is if celandro doesn't decide to just incorporate this sort of functionality in his own project (I hope he does), then there'll be no more need for any of this here.
