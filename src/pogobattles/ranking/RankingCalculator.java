@@ -18,10 +18,6 @@ import pogobattles.gamemaster.Move;
 import pogobattles.gamemaster.PrintUtil;
 
 public class RankingCalculator {
-  public static void calculateAllPrestige(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, boolean optimal) throws Exception {
-    calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, null, 15, 15, 15, 400, 15, 15, 15, 400, optimal);
-  }
-  
   public static void calculateAllPrestige(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int defLevel, boolean optimal) throws Exception {
     calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 15, 15, 15, 400, 15, 15, 15, defLevel, optimal);
   }
@@ -114,10 +110,6 @@ public class RankingCalculator {
       }
       writer.close();
     }
-  }
-  
-  public static void calculateAll(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets) throws Exception {
-    calculateAll(outputFolder, simulator, gameMaster, movesets, null, 15, 15, 15, 400, 15, 15, 15, 400);
   }
   
   public static void calculateAll(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int attLevel, int defLevel) throws Exception {
