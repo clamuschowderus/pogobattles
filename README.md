@@ -1,9 +1,9 @@
 # pogobattles
 pokebattler simulations generator. 
 
-First of all: Many, many thanks to reddit user celandro. I downloaded his code (https://github.com/celandro/pokebattler-fight) and incorporated into my own GAME_MASTER parser (with a fair amount of data model changes to accomodate my parser).
+First of all: Many, many thanks to reddit user /u/celandro. I downloaded his code (https://github.com/celandro/pokebattler-fight) and incorporated into my own GAME_MASTER parser (with a fair amount of data model changes to accomodate my parser).
 
-Second: Feel free to download and modify/play with the code. I just politely ask you to give credit to celandro if you do so for developing the core of pokebattler.
+Second: Feel free to download and modify/play with the code. I just politely ask you to give credit to /u/celandro if you do so for developing the core of pokebattler.
 
 Two main methods to run: pogobattles.Main.main() for simulations or pogobattles.PrintMain.main() to print out GAME_MASTER information.
 
