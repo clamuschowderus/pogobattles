@@ -7,9 +7,9 @@ Second: Feel free to download and modify/play with the code. I just politely ask
 
 Two main methods to run: pogobattles.Main.main() for simulations or pogobattles.PrintMain.main() to print out GAME_MASTER information.
 
-Adjust BASE_FOLDER value to resource folder location in both pogobattles.Main and pogobattles.PrintMain
+Point BASE_FOLDER value to the resource folder location in both pogobattles.Main and pogobattles.PrintMain
 
-Play with the parameters in pogobattles.Main to get different results.
+Play with the parameters in pogobattles.Main to get different results. Should be pretty stright forward. If you need more explanation read-on.
 
 pogobattles.ranking.RankingsCalculator has a few methods that take different parameters to drive the results. I'll list them down here:
 
