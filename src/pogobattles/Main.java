@@ -45,88 +45,140 @@ public class Main {
     AttackSimulator simulator = new AttackSimulator(gameMaster);
     
     List<String> defenders = new ArrayList<String>();
-    defenders.add("Blissey");
+    //defenders.add("Blissey");
+    defenders.add("Dragonite");
     //defenders.add("Snorlax");
-    //defenders.add("Gyarados");
     //defenders.add("Rhydon");
-    //defenders.add("Dragonite");
-    //defenders.add("Vaporeon");
     //defenders.add("Tyranitar");
-    //defenders.add("Flareon");
-    //defenders.add("Lapras");
-    //defenders.add("Jolteon");
+    //defenders.add("Gyarados");
+    //defenders.add("Vaporeon");
     //defenders.add("Exeggutor");
     //defenders.add("Espeon");
+    //defenders.add("Jolteon");
+    //defenders.add("Donphan");
+    //defenders.add("Flareon");
+    //defenders.add("Machamp");
+    //defenders.add("Scizor");
+    //defenders.add("Muk");
+    //defenders.add("Lapras");
+    //defenders.add("Granbull");
+
+    //defenders.add("Steelix");
+    //defenders.add("Poliwrath");
+    //defenders.add("Arcanine");
+    //defenders.add("Charizard");
     
+    List<String> attackers = new ArrayList<String>();
+    attackers.add("Chansey");
+    attackers.add("Blissey");
+    attackers.add("Umbreon");
+    attackers.add("Steelix");
+    attackers.add("Forretress");
+    attackers.add("Skarmory");
+    attackers.add("Lapras");
+    attackers.add("Azumarill");
+    attackers.add("Wigglytuff");
+    attackers.add("Sudowoodo");
+    attackers.add("Snorlax");
+    attackers.add("Lickitung");
+    attackers.add("Lanturn");
+    attackers.add("Noctowl");
+    attackers.add("Dewgong");
+    attackers.add("Magcargo");
+    attackers.add("Dunsparce");
+    attackers.add("Quagsire");
+    attackers.add("Furret");
+    attackers.add("Poliwrath");
+    attackers.add("Tangela");
+    attackers.add("Magneton");
+    attackers.add("Haunter");
+    attackers.add("Scizor");
+    attackers.add("Parasect");
+    attackers.add("Raticate");
+    attackers.add("Wobuffet");
+    
+
     String outputFolder = BASE_FOLDER + "CountersMax\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAll(outputFolder, simulator, gameMaster, movesets, defenders, 300, 400);
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAll(outputFolder, simulator, gameMaster, movesets, defenders, 300, 400);
 
-    outputFolder = BASE_FOLDER + "Counters30\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAll(outputFolder, simulator, gameMaster, movesets, defenders, 300, 300);
+    //outputFolder = BASE_FOLDER + "Counters30\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAll(outputFolder, simulator, gameMaster, movesets, defenders, 300, 300);
 
-    outputFolder = BASE_FOLDER + "Counters20\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAll(outputFolder, simulator, gameMaster, movesets, defenders, 300, 200);
+    //outputFolder = BASE_FOLDER + "Counters20\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAll(outputFolder, simulator, gameMaster, movesets, defenders, 300, 200);
     
-    outputFolder = BASE_FOLDER + "PrestigersMax\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 400, true);
+    //outputFolder = BASE_FOLDER + "PrestigersMax\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 400, true);
 
-    outputFolder = BASE_FOLDER + "Prestigers30\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 300, true);
+    //outputFolder = BASE_FOLDER + "Prestigers30\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 300, true);
 
-    outputFolder = BASE_FOLDER + "Prestigers20\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 200, true);
+    //outputFolder = BASE_FOLDER + "Prestigers20\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 200, true);
 
-    outputFolder = BASE_FOLDER + "1000PrestigeMax\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 400, false);
+    //outputFolder = BASE_FOLDER + "1000PrestigeMax\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 400, false);
 
-    outputFolder = BASE_FOLDER + "1000Prestige30\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 300, false);
+    //outputFolder = BASE_FOLDER + "1000Prestige30\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 300, false);
 
-    outputFolder = BASE_FOLDER + "1000Prestige20\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 200, false);
+    //outputFolder = BASE_FOLDER + "1000Prestige20\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 200, false);
 
-    outputFolder = BASE_FOLDER + "Prestigers0AttMax\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 0, 15, 15, 400, 15, 15, 15, 400, true);
+    //outputFolder = BASE_FOLDER + "Prestigers0AttMax\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 0, 15, 15, 400, 15, 15, 15, 400, true);
 
-    outputFolder = BASE_FOLDER + "Prestigers0Att30\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 0, 15, 15, 400, 15, 15, 15, 300, true);
+    //outputFolder = BASE_FOLDER + "Prestigers0Att30\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 0, 15, 15, 400, 15, 15, 15, 300, true);
 
-    outputFolder = BASE_FOLDER + "Prestigers0Att20\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 0, 15, 15, 400, 15, 15, 15, 200, true);
+    //outputFolder = BASE_FOLDER + "Prestigers0Att20\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 0, 15, 15, 400, 15, 15, 15, 200, true);
 
-    outputFolder = BASE_FOLDER + "Prestigers0Att0DefMax\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 0, 0, 15, 400, 15, 15, 15, 400, true);
+    //outputFolder = BASE_FOLDER + "Prestigers0Att0DefMax\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 0, 0, 15, 400, 15, 15, 15, 400, true);
 
-    outputFolder = BASE_FOLDER + "Prestigers0Att0Def30\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 0, 0, 15, 400, 15, 15, 15, 300, true);
+    //outputFolder = BASE_FOLDER + "Prestigers0Att0Def30\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 0, 0, 15, 400, 15, 15, 15, 300, true);
 
-    outputFolder = BASE_FOLDER + "Prestigers0Att0Def20\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 0, 0, 15, 400, 15, 15, 15, 200, true);
+    //outputFolder = BASE_FOLDER + "Prestigers0Att0Def20\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 0, 0, 15, 400, 15, 15, 15, 200, true);
+    
+    //outputFolder = BASE_FOLDER + "ByPrestigerDefLevel30\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestigeByAttackers(outputFolder, simulator, gameMaster, movesets, /*attackers*/null, /*defenders*/null, 300, false);
+    
+    //outputFolder = BASE_FOLDER + "ByPrestigerDefLevel20Meta\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestigeByAttackers(outputFolder, simulator, gameMaster, movesets, /*attackers*/null, defenders, 200, false);
+
+    //outputFolder = BASE_FOLDER + "1000Prestige20-39\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestigeLevelsRange(outputFolder, simulator, gameMaster, movesets, defenders, 0, 0, 15, 400, 15, 15, 15, 200, 390, false);
 
     PokemonDataCreator creator = new PokemonDataCreator(gameMaster);
-    BasePokemon attBase = pokemonByName(gameMaster, "BEEDRILL");
-    Move attQm = moveByName(gameMaster, "BUG_BITE");
-    Move attCm = moveByName(gameMaster, "SLUDGE_BOMB");
-    BasePokemon defBase = pokemonByName(gameMaster, "BLISSEY");
-    Move defQm = moveByName(gameMaster, "ZEN_HEADBUTT");
-    Move defCm = moveByName(gameMaster, "DAZZLING_GLEAM");
-    Pokemon attacker = creator.createPokemon(attBase, 330, 15, 15, 15, attQm, attCm);
-    Pokemon defender = creator.createPokemon(defBase, 400, 15, 15, 15, defQm, defCm);
+    BasePokemon attBase = pokemonByName(gameMaster, "ABRA");
+    Move attQm = moveByName(gameMaster, "CHARGE_BEAM");
+    Move attCm = moveByName(gameMaster, "PSYSHOCK");
+    BasePokemon defBase = pokemonByName(gameMaster, "ARIADOS");
+    Move defQm = moveByName(gameMaster, "INFESTATION");
+    Move defCm = moveByName(gameMaster, "CROSS_POISON");
+    Pokemon attacker = creator.createPokemon(attBase, 210, 15, 15, 15, attQm, attCm);
+    Pokemon defender = creator.createPokemon(defBase, 300, 15, 15, 15, defQm, defCm);
     FightResult result = simulator.calculateAttackDPS(attacker, defender, AttackStrategyType.DODGE_ALL, AttackStrategyType.DEFENSE);
     OutputStreamWriter writer = new OutputStreamWriter(System.out);
     System.out.println();
