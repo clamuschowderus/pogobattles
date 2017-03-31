@@ -15,6 +15,7 @@ public interface AttackStrategy {
         private int delay;
 
         public PokemonAttack(Move move, int delay) {
+            //System.out.println(move.getName());
             this.move = move;
             this.delay = delay;
         }

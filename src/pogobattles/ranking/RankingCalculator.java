@@ -2,6 +2,7 @@ package pogobattles.ranking;
 
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +20,7 @@ import pogobattles.gamemaster.PrintUtil;
 
 public class RankingCalculator {
   
-  public static boolean OUTPUT_RANKING = false;
+  public static boolean OUTPUT_RANKING = true;
   
   public static void calculateAllPrestigeByAttackers(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> attackers, List<String> defenders, int defLevel, boolean optimal) throws Exception {
     calculateAllPrestigeByAttackers(outputFolder, simulator, gameMaster, movesets, attackers, defenders, 15, 15, 15, 400, 15, 15, 15, defLevel, optimal);
@@ -72,23 +73,34 @@ public class RankingCalculator {
       FileWriter writer = new FileWriter(outputFolder + fileName);
       writer.write(PrintUtil.csvThis(new String[]{
           "Defender",
-          "QuickMove",
-          "ChargeMove",
+          "DefQuick",
+          "DefCharge",
           "DefCP",
+          "DefLevel",
+          "Attacker",
+          "AttQuick",
+          "AttCharge",
           "AttCP",
           "AttLevel",
           "PrestigeGained",
           "CombatTime",
-          "HpLeft",
-          "TotalHp",
-          "HpLeft%",
+          "AttHpLeft",
+          "AttTotHp",
+          "AttHpLeft%",
           "DefHpLeft",
           "DefTotHp",
-          "DefHp%",
-          "Power%",
-          "DPS",
-          "Strategy"
+          "DefHpLeft%",
+          "AttPower%",
+          "AttDPS",
+          "AttStrat"
       }));
+      if(OUTPUT_RANKING){
+        writer.write(",");
+        writer.write(PrintUtil.csvThis(new String[]{
+          "TimePower%",
+          "TotalPower%"
+        }));
+      }
       writer.write("\r\n");
       int[] losses = new int[strategies.length];
       int[] cutoff20_20 = new int[strategies.length];
@@ -137,7 +149,7 @@ public class RankingCalculator {
             logWriter.write("\r\n");
           }
           */
-          writeDefenderFightResult(writer, result);
+          writeFightResultDetailed(writer, result);
         }
         writer.flush();
       }
@@ -165,10 +177,10 @@ public class RankingCalculator {
     AttackStrategyType[] strategies = new AttackStrategyType[]{
       AttackStrategyType.DODGE_ALL,
       AttackStrategyType.DODGE_ALL2,
-      AttackStrategyType.DODGE_ALL3,
+      //AttackStrategyType.DODGE_ALL3,
       AttackStrategyType.DODGE_SPECIALS,
       AttackStrategyType.DODGE_SPECIALS2,
-      AttackStrategyType.DODGE_SPECIALS3,
+      //AttackStrategyType.DODGE_SPECIALS3,
       AttackStrategyType.CINEMATIC_ATTACK_WHEN_POSSIBLE
     };
     Set<Integer> movesetsKeySet = movesets.getMovesetInfoTable().keySet();
@@ -195,25 +207,35 @@ public class RankingCalculator {
       */
       FileWriter writer = new FileWriter(outputFolder + fileName);
       writer.write(PrintUtil.csvThis(new String[]{
-          "Pokemon",
-          "QuickMove",
-          "ChargeMove",
-          "CP",
-          "Level",
-          "PrestigeGained",
-          "CombatTime",
-          "HpLeft",
-          "TotalHp",
-          "HpLeft%",
+          "Defender",
+          "DefQuick",
+          "DefCharge",
           "DefCP",
           "DefLevel",
+          "Attacker",
+          "AttQuick",
+          "AttCharge",
+          "AttCP",
+          "AttLevel",
+          "PrestigeGained",
+          "CombatTime",
+          "AttHpLeft",
+          "AttTotHp",
+          "AttHpLeft%",
           "DefHpLeft",
           "DefTotHp",
-          "DefHp%",
-          "Power%",
-          "DPS",
-          "Strategy"
+          "DefHpLeft%",
+          "AttPower%",
+          "AttDPS",
+          "AttStrat"
       }));
+      if(OUTPUT_RANKING){
+        writer.write(",");
+        writer.write(PrintUtil.csvThis(new String[]{
+          "TimePower%",
+          "TotalPower%"
+        }));
+      }
       writer.write("\r\n");
       for(Integer key: movesetsKeySet){
         MovesetInfo attackerMovesetInfo = movesets.getMovesetInfoTable().get(key);
@@ -245,7 +267,7 @@ public class RankingCalculator {
             logWriter.write("\r\n");
           }
           */
-          writeFightResult(writer, result);
+          writeFightResultDetailed(writer, result);
         }
         writer.flush();
       }
@@ -254,18 +276,21 @@ public class RankingCalculator {
   }
   
   public static void calculateAll(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int attLevel, int defLevel) throws Exception {
-    calculateAll(outputFolder, simulator, gameMaster, movesets, defenders, 15, 15, 15, attLevel, 15, 15, 15, defLevel);
+    calculateAll(outputFolder, simulator, gameMaster, movesets, null, defenders, 15, 15, 15, attLevel, 15, 15, 15, defLevel);
   }
 
-  public static void calculateAll(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int ivAtt, int ivDef, int ivSta, int attLevel, int defIvAtt, int defIvDef, int defIvSta, int defLevel) throws Exception {
+  public static void calculateAll(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> attackers, List<String> defenders, int attLevel, int defLevel) throws Exception {
+    calculateAll(outputFolder, simulator, gameMaster, movesets, attackers, defenders, 15, 15, 15, attLevel, 15, 15, 15, defLevel);
+  }
+  
+  public static void calculateAll(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> attackers, List<String> defenders, int ivAtt, int ivDef, int ivSta, int attLevel, int defIvAtt, int defIvDef, int defIvSta, int defLevel) throws Exception {
     AttackStrategyType[] strategies = new AttackStrategyType[]{
-        AttackStrategyType.DODGE_ALL,
-        AttackStrategyType.DODGE_ALL2,
-        AttackStrategyType.DODGE_ALL3,
-        AttackStrategyType.DODGE_SPECIALS,
-        AttackStrategyType.DODGE_SPECIALS2,
-        AttackStrategyType.DODGE_SPECIALS3,
-        AttackStrategyType.CINEMATIC_ATTACK_WHEN_POSSIBLE
+        AttackStrategyType.DODGE_ALL
+        //AttackStrategyType.DODGE_ALL2,
+        //AttackStrategyType.DODGE_SPECIALS,
+        //AttackStrategyType.DODGE_SPECIALS2,
+        //AttackStrategyType.CINEMATIC_ATTACK_WHEN_POSSIBLE,
+        //AttackStrategyType.DODGE_ALL_REASONABLE_HUMAN
     };
     Set<Integer> movesetsKeySet = movesets.getMovesetInfoTable().keySet();
     List<MovesetInfo> movesetInfoList = new ArrayList<MovesetInfo>();
@@ -285,37 +310,50 @@ public class RankingCalculator {
       System.out.println("Calculating: " + fileName);
       FileWriter writer = new FileWriter(outputFolder + fileName);
       writer.write(PrintUtil.csvThis(new String[]{
-          "Pokemon",
-          "QuickMove",
-          "ChargeMove",
-          "CP",
-          "Level",
-          "PrestigeGained",
-          "CombatTime",
-          "HpLeft",
-          "TotalHp",
-          "HpLeft%",
+          "Defender",
+          "DefQuick",
+          "DefCharge",
           "DefCP",
           "DefLevel",
+          "Attacker",
+          "AttQuick",
+          "AttCharge",
+          "AttCP",
+          "AttLevel",
+          "PrestigeGained",
+          "CombatTime",
+          "AttHpLeft",
+          "AttTotHp",
+          "AttHpLeft%",
           "DefHpLeft",
           "DefTotHp",
-          "DefHp%",
-          "Power%",
-          "DPS",
-          "Strategy"
+          "DefHpLeft%",
+          "AttPower%",
+          "AttDPS",
+          "AttStrat"
       }));
+      if(OUTPUT_RANKING){
+        writer.write(",");
+        writer.write(PrintUtil.csvThis(new String[]{
+          "TimePower%",
+          "TotalPower%"
+        }));
+      }
       writer.write("\r\n");
       for(Integer key: movesetsKeySet){
-        MovesetInfo attackerMovesetInfo = movesets.getMovesetInfoTable().get(key);
-        BasePokemon attackerBase = gameMaster.getPokemonTable().get(attackerMovesetInfo.getPokemonId());
-        Move attackerQuick = gameMaster.getMoveTable().get(attackerMovesetInfo.getQuickMoveId());
-        Move attackerCharge = gameMaster.getMoveTable().get(attackerMovesetInfo.getChargeMoveId());
-        Pokemon attacker = creator.createPokemon(attackerBase, attLevel, ivAtt, ivDef, ivSta, attackerQuick, attackerCharge);
-        for(int i = 0; i < strategies.length; i++){
-          FightResult result = simulator.calculateAttackDPS(attacker, defender, strategies[i]);
-          writeFightResult(writer, result);
+        if(attackers == null || 
+            attackers.contains(PrintUtil.normalize(gameMaster.getPokemonTable().get(key/1000000).getName()))){
+          MovesetInfo attackerMovesetInfo = movesets.getMovesetInfoTable().get(key);
+          BasePokemon attackerBase = gameMaster.getPokemonTable().get(attackerMovesetInfo.getPokemonId());
+          Move attackerQuick = gameMaster.getMoveTable().get(attackerMovesetInfo.getQuickMoveId());
+          Move attackerCharge = gameMaster.getMoveTable().get(attackerMovesetInfo.getChargeMoveId());
+          Pokemon attacker = creator.createPokemon(attackerBase, attLevel, ivAtt, ivDef, ivSta, attackerQuick, attackerCharge);
+          for(int i = 0; i < strategies.length; i++){
+            FightResult result = simulator.calculateAttackDPS(attacker, defender, strategies[i], AttackStrategyType.DEFENSE);
+            writeFightResultDetailed(writer, result);
+          }
+          writer.flush();
         }
-        writer.flush();
       }
       writer.close();
     }
@@ -328,12 +366,12 @@ public class RankingCalculator {
   public static void calculateAllPrestigeLevelsRange(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int ivAtt, int ivDef, int ivSta, int maxAttLevel, int defIvAtt, int defIvDef, int defIvSta, int minDefLevel, int maxDefLevel, boolean optimal) throws Exception {
     AttackStrategyType[] strategies = new AttackStrategyType[]{
       AttackStrategyType.DODGE_ALL,
-      AttackStrategyType.DODGE_ALL2
+      AttackStrategyType.DODGE_ALL2,
       //AttackStrategyType.DODGE_ALL3,
-      //AttackStrategyType.DODGE_SPECIALS,
-      //AttackStrategyType.DODGE_SPECIALS2,
+      AttackStrategyType.DODGE_SPECIALS,
+      AttackStrategyType.DODGE_SPECIALS2,
       //AttackStrategyType.DODGE_SPECIALS3,
-      //AttackStrategyType.CINEMATIC_ATTACK_WHEN_POSSIBLE
+      AttackStrategyType.CINEMATIC_ATTACK_WHEN_POSSIBLE
     };
     Set<Integer> movesetsKeySet = movesets.getMovesetInfoTable().keySet();
     List<MovesetInfo> movesetInfoList = new ArrayList<MovesetInfo>();
@@ -344,34 +382,50 @@ public class RankingCalculator {
     }
     PokemonDataCreator creator = new PokemonDataCreator(gameMaster);
     movesetsKeySet = movesets.getMovesetInfoTable().keySet();
+    Hashtable<String, FileWriter> outputTable = new Hashtable<String, FileWriter>();
     for(MovesetInfo defenderMovesetInfo : movesetInfoList){
       BasePokemon defenderBase = gameMaster.getPokemonTable().get(defenderMovesetInfo.getPokemonId());
       Move defenderQuick = gameMaster.getMoveTable().get(defenderMovesetInfo.getQuickMoveId());
       Move defenderCharge = gameMaster.getMoveTable().get(defenderMovesetInfo.getChargeMoveId());
-      String fileName = defenderBase.getName() + "." + defenderQuick.getName() + "." + defenderCharge.getName() + ".csv";
-      FileWriter writer = new FileWriter(outputFolder + fileName);
-      writer.write(PrintUtil.csvThis(new String[]{
-          "Pokemon",
-          "QuickMove",
-          "ChargeMove",
-          "CP",
-          "Level",
-          "PrestigeGained",
-          "CombatTime",
-          "HpLeft",
-          "TotalHp",
-          "HpLeft%",
-          "DefCp",
-          "DefLevel",
-          "DefHpLeft",
-          "DefTotHp",
-          "DefHp%",
-          "Power%",
-          "DPS",
-          "Strategy"
-      }));
-      writer.write("\r\n");
-      System.out.println("Calculating: " + fileName);
+      //String fileName = defenderBase.getName() + "." + defenderQuick.getName() + "." + defenderCharge.getName() + ".csv";
+      //FileWriter writer = new FileWriter(outputFolder + fileName);
+      FileWriter writer = outputTable.get(defenderBase.getName());
+      if(writer == null){
+        writer = new FileWriter(outputFolder + defenderBase.getName() + ".csv");
+        outputTable.put(defenderBase.getName(), writer);
+        writer.write(PrintUtil.csvThis(new String[]{
+            "Defender",
+            "DefQuick",
+            "DefCharge",
+            "DefCP",
+            "DefLevel",
+            "Attacker",
+            "AttQuick",
+            "AttCharge",
+            "AttCP",
+            "AttLevel",
+            "PrestigeGained",
+            "CombatTime",
+            "AttHpLeft",
+            "AttTotHp",
+            "AttHpLeft%",
+            "DefHpLeft",
+            "DefTotHp",
+            "DefHpLeft%",
+            "AttPower%",
+            "AttDPS",
+            "AttStrat"
+        }));
+        if(OUTPUT_RANKING){
+          writer.write(",");
+          writer.write(PrintUtil.csvThis(new String[]{
+            "TimePower%",
+            "TotalPower%"
+          }));
+        }
+        writer.write("\r\n");
+      }
+      System.out.println("Calculating: " + defenderBase.getName() + "." + defenderQuick.getName() + "." + defenderCharge.getName());
       int currentDefLevel = minDefLevel;
       while(currentDefLevel <= maxDefLevel){
         Pokemon defender = creator.createPokemon(defenderBase, currentDefLevel, defIvAtt, defIvDef, defIvSta, defenderQuick, defenderCharge);
@@ -412,13 +466,17 @@ public class RankingCalculator {
                 logWriter.write("\r\n");
               }
               */
-              writeFightResult(writer, result);
+              writeFightResultDetailed(writer, result);
             }
             writer.flush();
           }
         }
         currentDefLevel += 5;
       }
+    }
+    Set<String> outputKeySet = outputTable.keySet();
+    for(String pokemonName : outputKeySet){
+      FileWriter writer = outputTable.get(pokemonName);
       writer.close();
     }
   }
@@ -428,7 +486,6 @@ public class RankingCalculator {
     Pokemon attacker = attackerResult.getPokemon();
     CombatantResult defenderResult = result.getCombatant(1);
     Pokemon defender = defenderResult.getPokemon();
-    double hpLeftPercent = (attackerResult.getEndHp()<1?0:((double)attackerResult.getEndHp()*100)/attackerResult.getStartHp());
     writer.write(PrintUtil.csvThis(new String[]{
         attacker.getBasePokemon().getName(),
         attacker.getQuickMove().getName(),
@@ -451,14 +508,11 @@ public class RankingCalculator {
     }));
     if(OUTPUT_RANKING){
       writer.write(",");
-      double timePercent =((double)Formulas.MAX_COMBAT_TIME_MS-result.getTotalCombatTime())/Formulas.MAX_COMBAT_TIME_MS;
-      double timeModifier = (1.0/(((-timePercent)+(75.0/50.0))*1.25))-0.5;
-      double healthModifier = (1/(((-(hpLeftPercent/100))-(1/50))*10))+1.1;
+      double timeToKill = ((double)defenderResult.getStartHp())/attackerResult.getDps();
+      double timePower = ((double)Formulas.MAX_COMBAT_TIME_MS)/(1000*timeToKill);
       writer.write(PrintUtil.csvThis(new String[]{
-          "" + timePercent,
-          "" + timeModifier,
-          "" + healthModifier,
-          "" + timeModifier*healthModifier
+          "" + timePower*100,
+          "" + Math.sqrt((timePower*result.getPower()))*100
       }));
     }
     writer.write("\r\n");
@@ -488,6 +542,55 @@ public class RankingCalculator {
         "" + attackerResult.getDps(),
         attackerResult.getStrategy().name()
     }));
+    if(OUTPUT_RANKING){
+      writer.write(",");
+      double timeToKill = ((double)defenderResult.getStartHp())/attackerResult.getDps();
+      double timePower = ((double)Formulas.MAX_COMBAT_TIME_MS)/(1000*timeToKill);
+      writer.write(PrintUtil.csvThis(new String[]{
+          "" + timePower*100,
+          "" + Math.sqrt((timePower*result.getPower()))*100
+      }));
+    }
+    writer.write("\r\n");
+  }
+
+  private static void writeFightResultDetailed(FileWriter writer, FightResult result) throws Exception {
+    CombatantResult attackerResult = result.getCombatant(0);
+    Pokemon attacker = attackerResult.getPokemon();
+    CombatantResult defenderResult = result.getCombatant(1);
+    Pokemon defender = defenderResult.getPokemon();
+    writer.write(PrintUtil.csvThis(new String[]{
+        defender.getBasePokemon().getName(),
+        defender.getQuickMove().getName(),
+        defender.getChargeMove().getName(),
+        "" + defender.getCp(),
+        "" + ((double)defender.getLevel())/10,
+        attacker.getBasePokemon().getName(),
+        attacker.getQuickMove().getName(),
+        attacker.getChargeMove().getName(),
+        "" + attacker.getCp(),
+        "" + ((double)attacker.getLevel())/10,
+        "" + result.getPrestige(),
+        "" + result.getTotalCombatTime(),
+        "" + attackerResult.getEndHp(),
+        "" + attackerResult.getStartHp(),
+        "" + (attackerResult.getEndHp()<1?"0":((double)attackerResult.getEndHp()*100)/attackerResult.getStartHp()),
+        "" + defenderResult.getEndHp(),
+        "" + defenderResult.getStartHp(),
+        "" + (defenderResult.getEndHp()<1?"0":((double)defenderResult.getEndHp()*100)/defenderResult.getStartHp()),
+        (result.getPower()*100) + "",
+        "" + attackerResult.getDps(),
+        attackerResult.getStrategy().name()
+    }));
+    if(OUTPUT_RANKING){
+      writer.write(",");
+      double timeToKill = ((double)defenderResult.getStartHp())/attackerResult.getDps();
+      double timePower = ((double)Formulas.MAX_COMBAT_TIME_MS)/(1000*timeToKill);
+      writer.write(PrintUtil.csvThis(new String[]{
+          "" + timePower*100,
+          "" + Math.sqrt((timePower*result.getPower()))*100
+      }));
+    }
     writer.write("\r\n");
   }
 }

@@ -141,6 +141,9 @@ public class CombatantState {
 
     void applyAttack(CombatResult r, int time) {
         numAttacks++;
+        //if(numAttacks < 3){
+        //  System.out.println("Applying " + getPokemon().getBasePokemon().getName() + " attack! " + getActualCombatTime());
+        //}
 
         timeSinceLastMove += time;
         damageAlreadyOccurred = true;
