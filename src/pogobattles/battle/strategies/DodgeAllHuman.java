@@ -14,10 +14,11 @@ public class DodgeAllHuman implements AttackStrategy {
     public static final int SECOND_ATTACK_DELAY = 1000;
     public static final int FIRST_ATTACK_TIME = 1600 - Formulas.START_COMBAT_TIME;
     public static final int MIN_DEFENDER_DELAY_CAUTIOUS = 1500;
-    public static final int MIN_DEFENDER_DELAY_REASONABLE = 1650;
-    public static final int MIN_DEFENDER_DELAY_RISKY = 1800;
-    public static final int MIN_DEFENDER_DELAY_RECKLESS = 2000;
+    public static final int MIN_DEFENDER_DELAY_REASONABLE = 1750;
+    public static final int MIN_DEFENDER_DELAY_RISKY = 2000;
+    public static final int MIN_DEFENDER_DELAY_RECKLESS = 2250;
     public static final int CHARGE_REALIZATION_DELAY = 700; //Human reaction + time to swipe to dodge.
+    public static final int HUMAN_REACTION_TIME = 250; //Average Human reaction time to visual stimulus.
     
     public AttackStrategyType getType() {
         return type;
@@ -38,8 +39,8 @@ public class DodgeAllHuman implements AttackStrategy {
         // dodge special if we can
         if (defenderState.getNextMove() != null && defenderState.getTimeToNextDamage() > 0
                 && !defenderState.isDodged()) {
-            if (defenderState.getTimeToNextDamage() <= Formulas.DODGE_WINDOW + extraDelay) {
-                //if getTimeToNextDamage() is less than DODGE_WINDOW, we've already seen the yellow flash, dodge immediately.
+            if (defenderState.getTimeToNextDamage() <= Formulas.DODGE_WINDOW + extraDelay - HUMAN_REACTION_TIME) {
+                //if getTimeToNextDamage() is less than DODGE_WINDOW - HUMAN_REACTION_TIME, we've already seen the yellow flash, dodge immediately.
                 dodgedSpecial = defenderState.isNextMoveSpecial();
                 return new PokemonAttack(Move.DODGE_MOVE, extraDelay);
             } else if (earliestNextDamageTime > attackerState.getPokemon().getChargeMove().getDuration() + extraDelay + CAST_TIME
@@ -77,7 +78,7 @@ public class DodgeAllHuman implements AttackStrategy {
 
                 dodgedSpecial = defenderState.isNextMoveSpecial();
                 return new PokemonAttack(Move.DODGE_MOVE,
-                        Math.max(0, dodgeWait - Formulas.DODGE_WINDOW));
+                        Math.max(0, dodgeWait - Formulas.DODGE_WINDOW + HUMAN_REACTION_TIME));
             }
         }
         if (attackerState.getCurrentEnergy() >= -1 * attackerState.getPokemon().getChargeMove().getEnergyDelta() &&
