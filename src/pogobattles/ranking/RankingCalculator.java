@@ -8,10 +8,12 @@ import java.util.Set;
 
 import pogobattles.battle.data.Pokemon;
 import pogobattles.battle.data.PokemonDataCreator;
-import pogobattles.battle.simulator.AttackSimulator;
 import pogobattles.battle.simulator.CombatantResult;
 import pogobattles.battle.simulator.FightResult;
+import pogobattles.battle.simulator.FightSimulator;
 import pogobattles.battle.simulator.Formulas;
+import pogobattles.battle.simulator.MonteCarloFightResult;
+import pogobattles.battle.simulator.MonteCarloFightSimulator;
 import pogobattles.battle.strategies.AttackStrategyType;
 import pogobattles.gamemaster.BasePokemon;
 import pogobattles.gamemaster.GameMaster;
@@ -22,11 +24,11 @@ public class RankingCalculator {
   
   public static boolean OUTPUT_RANKING = true;
   
-  public static void calculateAllPrestigeByAttackers(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> attackers, List<String> defenders, int defLevel, boolean optimal) throws Exception {
+  public static void calculateAllPrestigeByAttackers(String outputFolder, FightSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> attackers, List<String> defenders, int defLevel, boolean optimal) throws Exception {
     calculateAllPrestigeByAttackers(outputFolder, simulator, gameMaster, movesets, attackers, defenders, 15, 15, 15, 400, 15, 15, 15, defLevel, optimal);
   }
 
-  public static void calculateAllPrestigeByAttackers(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> attackers, List<String> defenders, int ivAtt, int ivDef, int ivSta, int maxAttLevel, int defIvAtt, int defIvDef, int defIvSta, int defLevel, boolean optimal) throws Exception {
+  public static void calculateAllPrestigeByAttackers(String outputFolder, FightSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> attackers, List<String> defenders, int ivAtt, int ivDef, int ivSta, int maxAttLevel, int defIvAtt, int defIvDef, int defIvSta, int defLevel, boolean optimal) throws Exception {
     AttackStrategyType[] strategies = new AttackStrategyType[]{
       AttackStrategyType.DODGE_ALL,
       AttackStrategyType.DODGE_ALL2
@@ -169,11 +171,11 @@ public class RankingCalculator {
     lossesWriter.close();
   }
   
-  public static void calculateAllPrestige(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int defLevel, boolean optimal) throws Exception {
+  public static void calculateAllPrestige(String outputFolder, FightSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int defLevel, boolean optimal) throws Exception {
     calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 15, 15, 15, 400, 15, 15, 15, defLevel, optimal);
   }
 
-  public static void calculateAllPrestige(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int ivAtt, int ivDef, int ivSta, int maxAttLevel, int defIvAtt, int defIvDef, int defIvSta, int defLevel, boolean optimal) throws Exception {
+  public static void calculateAllPrestige(String outputFolder, FightSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int ivAtt, int ivDef, int ivSta, int maxAttLevel, int defIvAtt, int defIvDef, int defIvSta, int defLevel, boolean optimal) throws Exception {
     AttackStrategyType[] strategies = new AttackStrategyType[]{
       AttackStrategyType.DODGE_ALL,
       AttackStrategyType.DODGE_ALL2,
@@ -275,15 +277,15 @@ public class RankingCalculator {
     }
   }
   
-  public static void calculateAll(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int attLevel, int defLevel) throws Exception {
+  public static void calculateAll(String outputFolder, FightSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int attLevel, int defLevel) throws Exception {
     calculateAll(outputFolder, simulator, gameMaster, movesets, null, defenders, 15, 15, 15, attLevel, 15, 15, 15, defLevel);
   }
 
-  public static void calculateAll(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> attackers, List<String> defenders, int attLevel, int defLevel) throws Exception {
+  public static void calculateAll(String outputFolder, FightSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> attackers, List<String> defenders, int attLevel, int defLevel) throws Exception {
     calculateAll(outputFolder, simulator, gameMaster, movesets, attackers, defenders, 15, 15, 15, attLevel, 15, 15, 15, defLevel);
   }
   
-  public static void calculateAll(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> attackers, List<String> defenders, int ivAtt, int ivDef, int ivSta, int attLevel, int defIvAtt, int defIvDef, int defIvSta, int defLevel) throws Exception {
+  public static void calculateAll(String outputFolder, FightSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> attackers, List<String> defenders, int ivAtt, int ivDef, int ivSta, int attLevel, int defIvAtt, int defIvDef, int defIvSta, int defLevel) throws Exception {
     AttackStrategyType[] strategies = new AttackStrategyType[]{
         AttackStrategyType.DODGE_ALL
         //AttackStrategyType.DODGE_ALL2,
@@ -359,19 +361,20 @@ public class RankingCalculator {
     }
   }
 
-  public static void calculateAllPrestigeLevelsRange(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int minDefLevel, int maxDefLevel, boolean optimal) throws Exception {
+  public static void calculateAllPrestigeLevelsRange(String outputFolder, FightSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int minDefLevel, int maxDefLevel, boolean optimal) throws Exception {
     calculateAllPrestigeLevelsRange(outputFolder, simulator, gameMaster, movesets, defenders, 15, 15, 15, 400, 15, 15, 15, minDefLevel, maxDefLevel, optimal);
   }
 
-  public static void calculateAllPrestigeLevelsRange(String outputFolder, AttackSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int ivAtt, int ivDef, int ivSta, int maxAttLevel, int defIvAtt, int defIvDef, int defIvSta, int minDefLevel, int maxDefLevel, boolean optimal) throws Exception {
+  public static void calculateAllPrestigeLevelsRange(String outputFolder, FightSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int ivAtt, int ivDef, int ivSta, int maxAttLevel, int defIvAtt, int defIvDef, int defIvSta, int minDefLevel, int maxDefLevel, boolean optimal) throws Exception {
     AttackStrategyType[] strategies = new AttackStrategyType[]{
-      AttackStrategyType.DODGE_ALL,
-      AttackStrategyType.DODGE_ALL2,
+      //AttackStrategyType.DODGE_ALL,
+      //AttackStrategyType.DODGE_ALL2,
       //AttackStrategyType.DODGE_ALL3,
-      AttackStrategyType.DODGE_SPECIALS,
-      AttackStrategyType.DODGE_SPECIALS2,
+      //AttackStrategyType.DODGE_SPECIALS,
+      //AttackStrategyType.DODGE_SPECIALS2,
       //AttackStrategyType.DODGE_SPECIALS3,
-      AttackStrategyType.CINEMATIC_ATTACK_WHEN_POSSIBLE
+      //AttackStrategyType.CINEMATIC_ATTACK_WHEN_POSSIBLE,
+      AttackStrategyType.DODGE_ALL_CAUTIOUS_HUMAN
     };
     Set<Integer> movesetsKeySet = movesets.getMovesetInfoTable().keySet();
     List<MovesetInfo> movesetInfoList = new ArrayList<MovesetInfo>();
@@ -416,6 +419,13 @@ public class RankingCalculator {
             "AttDPS",
             "AttStrat"
         }));
+        if(simulator instanceof MonteCarloFightSimulator){
+          writer.write(",");
+          writer.write(PrintUtil.csvThis(new String[]{
+            "Win%",
+            "Timeout%"
+          }));
+        }
         if(OUTPUT_RANKING){
           writer.write(",");
           writer.write(PrintUtil.csvThis(new String[]{
@@ -448,7 +458,7 @@ public class RankingCalculator {
               while(!result.isWin() && currentLevel < maxAttLevel && optimal){
                 currentLevel +=5;
                 Pokemon tryAgainAttacker = creator.createPokemon(attackerBase, currentLevel, ivAtt, ivDef, ivSta, attackerQuick, attackerCharge);
-                result = simulator.calculateAttackDPS(tryAgainAttacker, defender, strategies[i]);
+                result = simulator.calculateAttackDPS(tryAgainAttacker, defender, strategies[i], AttackStrategyType.DEFENSE_RANDOM);
               }
               // Debug fight to log:
               /*
@@ -582,6 +592,13 @@ public class RankingCalculator {
         "" + attackerResult.getDps(),
         attackerResult.getStrategy().name()
     }));
+    if(result instanceof MonteCarloFightResult){
+      writer.write(",");
+      writer.write(PrintUtil.csvThis(new String[]{
+        "" + (((MonteCarloFightResult)result).getWinRatio()*100),
+        "" + (((MonteCarloFightResult)result).getTimeoutRatio()*100)
+      }));
+    }
     if(OUTPUT_RANKING){
       writer.write(",");
       double timeToKill = ((double)defenderResult.getStartHp())/attackerResult.getDps();

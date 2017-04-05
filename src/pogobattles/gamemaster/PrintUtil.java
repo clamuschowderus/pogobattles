@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import pogobattles.battle.simulator.CombatResult;
 import pogobattles.battle.simulator.CombatantResult;
 import pogobattles.battle.simulator.FightResult;
+import pogobattles.battle.simulator.MonteCarloFightResult;
 import pogobattles.ranking.MovesetInfo;
 import pogobattles.ranking.MovesetTable;
 
@@ -36,12 +37,47 @@ public class PrintUtil {
       System.out.println();
     }
     
+    Move minChargeStart = null;
+    Move maxChargeStart = null;
+    Move minFastStart = null;
+    Move maxFastStart = null;
     System.out.println("\r\n\r\nMOVES:\r\n");
     
     for(Integer index : moveIdsSorted){
-      System.out.println(printMove(gameMaster, moveTable.get(index)));
+      Move currentMove = moveTable.get(index);
+      if(currentMove.getEnergyDelta() < 0){
+        if(minChargeStart == null){
+          minChargeStart = currentMove;
+          maxChargeStart = currentMove;
+        }else{
+          if(minChargeStart.getDamageWindowStart() > currentMove.getDamageWindowStart()){
+            minChargeStart = currentMove;
+          }
+          if(maxChargeStart.getDamageWindowStart() < currentMove.getDamageWindowStart()){
+            maxChargeStart = currentMove;
+          }
+        }
+      }else if(currentMove.getEnergyDelta() > 0){
+        if(minFastStart == null){
+          minFastStart = currentMove;
+          maxFastStart = currentMove;
+        }else{
+          if(minFastStart.getDamageWindowStart() > currentMove.getDamageWindowStart()){
+            minFastStart = currentMove;
+          }
+          if(maxFastStart.getDamageWindowStart() < currentMove.getDamageWindowStart()){
+            maxFastStart = currentMove;
+          }
+        }
+      }//ignore zero energy moves
+      System.out.println(printMove(gameMaster, currentMove));
       System.out.println();
     }
+    
+    System.out.println("Fastest fast: " + minFastStart.getName() + ". " + minFastStart.getDamageWindowStart() + "ms");
+    System.out.println("Slowest fast: " + maxFastStart.getName() + ". " + maxFastStart.getDamageWindowStart() + "ms");
+    System.out.println("Fastest charge: " + minChargeStart.getName() + ". " + minChargeStart.getDamageWindowStart() + "ms");
+    System.out.println("Slowest charge: " + maxChargeStart.getName() + ". " + maxChargeStart.getDamageWindowStart() + "ms");
   }
   
   public static String printBasePokemon(GameMaster gameMaster, BasePokemon pokemon){
@@ -545,7 +581,7 @@ public class PrintUtil {
   public static void printFightResult(Writer out, FightResult result) throws Exception {
     CombatantResult att = result.getCombatant(0);
     CombatantResult def = result.getCombatant(1);
-    out.write(MessageFormat.format("{0}({1}/{2}): {3}ms. Hp: {4}/{5}\r\n", 
+    out.write(MessageFormat.format("{0}({1}/{2}): {3}ms. Hp: {4}/{5}\r\n\r\n", 
         new Object[]{
           att.getPokemon().getBasePokemon().getName(), 
           att.getPokemon().getQuickMove().getName(), 
@@ -556,6 +592,11 @@ public class PrintUtil {
         }));
     for(CombatResult results : result.getCombatResults()){
       out.write(MessageFormat.format("{0}: {1} - {2}" + (results.getAttackMove().getMoveId() == Move.DODGE_ID?"":" Dmg: {3}") + "\r\n", new Object[]{100000 - results.getCurrentTime(), results.getAttacker().getBasePokemon().getName(), results.getAttackMove().getName(), results.getDamage()}));
+    }
+    if(result instanceof MonteCarloFightResult){
+      for(CombatResult results : ((MonteCarloFightResult)result).getWorstCombatResults()){
+        out.write(MessageFormat.format("{0}: {1} - {2}" + (results.getAttackMove().getMoveId() == Move.DODGE_ID?"":" Dmg: {3}") + "\r\n", new Object[]{100000 - results.getCurrentTime(), results.getAttacker().getBasePokemon().getName(), results.getAttackMove().getName(), results.getDamage()}));
+      }
     }
     
   }
