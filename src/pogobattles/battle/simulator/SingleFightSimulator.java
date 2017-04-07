@@ -166,7 +166,7 @@ public class SingleFightSimulator implements FightSimulator {
                 CombatResult result = Formulas.getCombatResult(gameMaster, defenderState.getAttack(),
                         attackerState.getDefense(), defenderState.getNextMove(), d, a, defenderState.isDodged());
                 currentTime += timeToNextDefenseDamage;
-                
+               
                 result.setCurrentTime(currentTime);
                 result.setAttacker(defender);
                 result.setDefender(attacker);
@@ -197,7 +197,6 @@ public class SingleFightSimulator implements FightSimulator {
                 //            energyGain}));
                 attackerState.moveTime(timeToNextDefense);
             }
-                
         }
         int prestige = (defenderState.isAlive())?0:Formulas.defensePrestigeGain(attacker.getCp(), defender.getCp());
         fightResult.setWin(!defenderState.isAlive());

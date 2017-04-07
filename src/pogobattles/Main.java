@@ -45,7 +45,7 @@ public class Main {
     */
     
     FightSimulator simulator = new SingleFightSimulator(gameMaster);
-    FightSimulator monteCarloSimulator = new MonteCarloFightSimulator(gameMaster, 100);
+    FightSimulator monteCarloSimulator = new MonteCarloFightSimulator(gameMaster, 50);
     
     List<String> defenders = new ArrayList<String>();
     /*
@@ -96,14 +96,18 @@ public class Main {
     defenders.add("Hypno");
     defenders.add("Kingler");
     defenders.add("Electrode");
+    */
     defenders.add("Exeggutor");
+    /*
     defenders.add("Marowak");
     defenders.add("Hitmonlee");
     defenders.add("Hitmonchan");
     defenders.add("Lickitung");
     defenders.add("Weezing");
+    */
     defenders.add("Rhydon");
     defenders.add("Blissey");
+    /*
     defenders.add("Tangela");
     defenders.add("Kangaskhan");
     defenders.add("Kingdra");
@@ -116,7 +120,9 @@ public class Main {
     defenders.add("Magmar");
     defenders.add("Pinsir");
     defenders.add("Tauros");
+    */
     defenders.add("Gyarados");
+    /*
     defenders.add("Lapras");
     */
     defenders.add("Vaporeon");
@@ -129,8 +135,10 @@ public class Main {
     defenders.add("Omastar");
     defenders.add("Kabutops");
     defenders.add("Aerodactyl");
+    */
     defenders.add("Snorlax");
     defenders.add("Dragonite");
+    /*
     */
     //GenII
     /*
@@ -176,7 +184,9 @@ public class Main {
     defenders.add("Donphan");
     defenders.add("Stantler");
     defenders.add("Hitmontop");
+    */
     defenders.add("Tyranitar");
+    /*
     */
     
     List<String> attackers = new ArrayList<String>();
@@ -334,6 +344,10 @@ public class Main {
     //checkAndCreateFolder(outputFolder);
     //RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 400, false);
 
+    //outputFolder = BASE_FOLDER + "MonteCarlo-1000PrestigeMax\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestige(outputFolder, monteCarloSimulator, gameMaster, movesets, defenders, 400, false);
+
     //outputFolder = BASE_FOLDER + "1000Prestige30\\";
     //checkAndCreateFolder(outputFolder);
     //RankingCalculator.calculateAllPrestige(outputFolder, simulator, gameMaster, movesets, defenders, 300, false);
@@ -380,22 +394,23 @@ public class Main {
 
     //outputFolder = BASE_FOLDER + "MonteCarlo-1000Prestige20-39\\";
     //checkAndCreateFolder(outputFolder);
-    //RankingCalculator.calculateAllPrestigeLevelsRange(outputFolder, monteCarloSimulator, gameMaster, movesets, defenders, 15, 15, 15, 400, 15, 15, 15, 200, 390, false);
+    //RankingCalculator.calculateAllPrestigeLevelsRange(outputFolder, monteCarloSimulator, gameMaster, movesets, defenders, 15, 15, 15, 400, 15, 15, 15, 200, 390, false, 10);
 
-    outputFolder = BASE_FOLDER + "MonteCarlo-1000Prestige20-39\\";
+    outputFolder = BASE_FOLDER + "MonteCarlo-1000Prestige25-39\\";
     checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAllPrestigeLevelsRange(outputFolder, monteCarloSimulator, gameMaster, movesets, defenders, 15, 15, 15, 400, 15, 15, 15, 200, 390, false);
+    RankingCalculator.calculateAllPrestigeLevelsRange(outputFolder, monteCarloSimulator, gameMaster, movesets, defenders, 15, 15, 15, 400, 15, 15, 15, 250, 390, false, 20);
 
     PokemonDataCreator creator = new PokemonDataCreator(gameMaster);
-    BasePokemon attBase = pokemonByName(gameMaster, "ALAKAZAM");
-    Move attQm = moveByName(gameMaster, "PSYCHO_CUT");
-    Move attCm = moveByName(gameMaster, "FUTURESIGHT");
-    BasePokemon defBase = pokemonByName(gameMaster, "RHYDON");
-    Move defQm = moveByName(gameMaster, "MUD_SLAP");
-    Move defCm = moveByName(gameMaster, "STONE_EDGE");
-    Pokemon attacker = creator.createPokemon(attBase, 300, 15, 15, 15, attQm, attCm);
-    Pokemon defender = creator.createPokemon(defBase, 400, 15, 15, 15, defQm, defCm);
-    MonteCarloFightResult result = (MonteCarloFightResult)monteCarloSimulator.calculateAttackDPS(attacker, defender, AttackStrategyType.DODGE_ALL_RECKLESS_HUMAN, AttackStrategyType.DEFENSE_RANDOM);
+    BasePokemon attBase = pokemonByName(gameMaster, "ELECTRODE");
+    Move attQm = moveByName(gameMaster, "VOLT_SWITCH");
+    Move attCm = moveByName(gameMaster, "HYPER_BEAM");
+    BasePokemon defBase = pokemonByName(gameMaster, "DRAGONITE");
+    Move defQm = moveByName(gameMaster, "DRAGON_BREATH");
+    Move defCm = moveByName(gameMaster, "DRAGON_CLAW");
+    Pokemon attacker = creator.createPokemon(attBase, 235, 15, 15, 15, attQm, attCm);
+    Pokemon defender = creator.createPokemon(defBase, 250, 15, 15, 15, defQm, defCm);
+    MonteCarloFightResult result = (MonteCarloFightResult)monteCarloSimulator.calculateAttackDPS(attacker, defender, AttackStrategyType.DODGE_ALL_CAUTIOUS_HUMAN, AttackStrategyType.DEFENSE_RANDOM);
+    //FightResult result = simulator.calculateAttackDPS(attacker, defender, AttackStrategyType.DODGE_SPECIALS_HUMAN, AttackStrategyType.DEFENSE_RANDOM);
     OutputStreamWriter writer = new OutputStreamWriter(System.out);
     System.out.println();
     PrintUtil.printFightResult(writer, result);

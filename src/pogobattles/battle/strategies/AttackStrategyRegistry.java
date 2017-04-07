@@ -47,6 +47,8 @@ public class AttackStrategyRegistry {
         return new DodgeAllHuman(0, AttackStrategyType.DODGE_ALL_RISKY_HUMAN, DodgeAllHuman.MIN_DEFENDER_DELAY_RISKY);
       case DODGE_ALL_RECKLESS_HUMAN:
         return new DodgeAllHuman(0, AttackStrategyType.DODGE_ALL_RECKLESS_HUMAN, DodgeAllHuman.MIN_DEFENDER_DELAY_RECKLESS);
+      case DODGE_SPECIALS_HUMAN:
+        return new DodgeAllHuman(0, AttackStrategyType.DODGE_SPECIALS_HUMAN, DodgeAllHuman.MIN_DEFENDER_DELAY_DODGE_SPECIALS);
       default:
         throw new IllegalArgumentException("AttackStrategyNotFound");
       }

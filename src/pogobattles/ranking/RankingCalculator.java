@@ -73,37 +73,7 @@ public class RankingCalculator {
       FileWriter logWriter = new FileWriter(logsPath + fileName + ".log");
       */
       FileWriter writer = new FileWriter(outputFolder + fileName);
-      writer.write(PrintUtil.csvThis(new String[]{
-          "Defender",
-          "DefQuick",
-          "DefCharge",
-          "DefCP",
-          "DefLevel",
-          "Attacker",
-          "AttQuick",
-          "AttCharge",
-          "AttCP",
-          "AttLevel",
-          "PrestigeGained",
-          "CombatTime",
-          "AttHpLeft",
-          "AttTotHp",
-          "AttHpLeft%",
-          "DefHpLeft",
-          "DefTotHp",
-          "DefHpLeft%",
-          "AttPower%",
-          "AttDPS",
-          "AttStrat"
-      }));
-      if(OUTPUT_RANKING){
-        writer.write(",");
-        writer.write(PrintUtil.csvThis(new String[]{
-          "TimePower%",
-          "TotalPower%"
-        }));
-      }
-      writer.write("\r\n");
+      writeHeader(writer, simulator instanceof MonteCarloFightSimulator);
       int[] losses = new int[strategies.length];
       int[] cutoff20_20 = new int[strategies.length];
       int[] cutoff30_30 = new int[strategies.length];
@@ -177,13 +147,18 @@ public class RankingCalculator {
 
   public static void calculateAllPrestige(String outputFolder, FightSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int ivAtt, int ivDef, int ivSta, int maxAttLevel, int defIvAtt, int defIvDef, int defIvSta, int defLevel, boolean optimal) throws Exception {
     AttackStrategyType[] strategies = new AttackStrategyType[]{
-      AttackStrategyType.DODGE_ALL,
-      AttackStrategyType.DODGE_ALL2,
+      //AttackStrategyType.DODGE_ALL,
+      //AttackStrategyType.DODGE_ALL2,
       //AttackStrategyType.DODGE_ALL3,
-      AttackStrategyType.DODGE_SPECIALS,
-      AttackStrategyType.DODGE_SPECIALS2,
+      //AttackStrategyType.DODGE_SPECIALS,
+      //AttackStrategyType.DODGE_SPECIALS2,
       //AttackStrategyType.DODGE_SPECIALS3,
-      AttackStrategyType.CINEMATIC_ATTACK_WHEN_POSSIBLE
+      //AttackStrategyType.CINEMATIC_ATTACK_WHEN_POSSIBLE,
+      AttackStrategyType.DODGE_ALL_CAUTIOUS_HUMAN,
+      AttackStrategyType.DODGE_ALL_REASONABLE_HUMAN,
+      AttackStrategyType.DODGE_ALL_RISKY_HUMAN,
+      AttackStrategyType.DODGE_ALL_RECKLESS_HUMAN,
+      AttackStrategyType.DODGE_SPECIALS_HUMAN   
     };
     Set<Integer> movesetsKeySet = movesets.getMovesetInfoTable().keySet();
     List<MovesetInfo> movesetInfoList = new ArrayList<MovesetInfo>();
@@ -208,37 +183,7 @@ public class RankingCalculator {
       FileWriter logWriter = new FileWriter(logsPath + fileName + ".log");
       */
       FileWriter writer = new FileWriter(outputFolder + fileName);
-      writer.write(PrintUtil.csvThis(new String[]{
-          "Defender",
-          "DefQuick",
-          "DefCharge",
-          "DefCP",
-          "DefLevel",
-          "Attacker",
-          "AttQuick",
-          "AttCharge",
-          "AttCP",
-          "AttLevel",
-          "PrestigeGained",
-          "CombatTime",
-          "AttHpLeft",
-          "AttTotHp",
-          "AttHpLeft%",
-          "DefHpLeft",
-          "DefTotHp",
-          "DefHpLeft%",
-          "AttPower%",
-          "AttDPS",
-          "AttStrat"
-      }));
-      if(OUTPUT_RANKING){
-        writer.write(",");
-        writer.write(PrintUtil.csvThis(new String[]{
-          "TimePower%",
-          "TotalPower%"
-        }));
-      }
-      writer.write("\r\n");
+      writeHeader(writer, simulator instanceof MonteCarloFightSimulator);
       for(Integer key: movesetsKeySet){
         MovesetInfo attackerMovesetInfo = movesets.getMovesetInfoTable().get(key);
         BasePokemon attackerBase = gameMaster.getPokemonTable().get(attackerMovesetInfo.getPokemonId());
@@ -311,37 +256,7 @@ public class RankingCalculator {
       String fileName = defenderBase.getName() + "." + defenderQuick.getName() + "." + defenderCharge.getName() + ".csv";
       System.out.println("Calculating: " + fileName);
       FileWriter writer = new FileWriter(outputFolder + fileName);
-      writer.write(PrintUtil.csvThis(new String[]{
-          "Defender",
-          "DefQuick",
-          "DefCharge",
-          "DefCP",
-          "DefLevel",
-          "Attacker",
-          "AttQuick",
-          "AttCharge",
-          "AttCP",
-          "AttLevel",
-          "PrestigeGained",
-          "CombatTime",
-          "AttHpLeft",
-          "AttTotHp",
-          "AttHpLeft%",
-          "DefHpLeft",
-          "DefTotHp",
-          "DefHpLeft%",
-          "AttPower%",
-          "AttDPS",
-          "AttStrat"
-      }));
-      if(OUTPUT_RANKING){
-        writer.write(",");
-        writer.write(PrintUtil.csvThis(new String[]{
-          "TimePower%",
-          "TotalPower%"
-        }));
-      }
-      writer.write("\r\n");
+      writeHeader(writer, simulator instanceof MonteCarloFightSimulator);
       for(Integer key: movesetsKeySet){
         if(attackers == null || 
             attackers.contains(PrintUtil.normalize(gameMaster.getPokemonTable().get(key/1000000).getName()))){
@@ -366,6 +281,10 @@ public class RankingCalculator {
   }
 
   public static void calculateAllPrestigeLevelsRange(String outputFolder, FightSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int ivAtt, int ivDef, int ivSta, int maxAttLevel, int defIvAtt, int defIvDef, int defIvSta, int minDefLevel, int maxDefLevel, boolean optimal) throws Exception {
+    calculateAllPrestigeLevelsRange(outputFolder, simulator, gameMaster, movesets, defenders, ivAtt, ivDef, ivSta, maxAttLevel, defIvAtt, defIvDef, defIvSta, minDefLevel, maxDefLevel, optimal, 5);
+  }  
+  
+  public static void calculateAllPrestigeLevelsRange(String outputFolder, FightSimulator simulator, GameMaster gameMaster, MovesetTable movesets, List<String> defenders, int ivAtt, int ivDef, int ivSta, int maxAttLevel, int defIvAtt, int defIvDef, int defIvSta, int minDefLevel, int maxDefLevel, boolean optimal, int levelIncrement) throws Exception {
     AttackStrategyType[] strategies = new AttackStrategyType[]{
       //AttackStrategyType.DODGE_ALL,
       //AttackStrategyType.DODGE_ALL2,
@@ -374,7 +293,10 @@ public class RankingCalculator {
       //AttackStrategyType.DODGE_SPECIALS2,
       //AttackStrategyType.DODGE_SPECIALS3,
       //AttackStrategyType.CINEMATIC_ATTACK_WHEN_POSSIBLE,
-      AttackStrategyType.DODGE_ALL_CAUTIOUS_HUMAN
+      AttackStrategyType.DODGE_ALL_CAUTIOUS_HUMAN,
+      AttackStrategyType.DODGE_ALL_REASONABLE_HUMAN,
+      AttackStrategyType.DODGE_ALL_RISKY_HUMAN,
+      AttackStrategyType.DODGE_SPECIALS_HUMAN
     };
     Set<Integer> movesetsKeySet = movesets.getMovesetInfoTable().keySet();
     List<MovesetInfo> movesetInfoList = new ArrayList<MovesetInfo>();
@@ -396,44 +318,7 @@ public class RankingCalculator {
       if(writer == null){
         writer = new FileWriter(outputFolder + defenderBase.getName() + ".csv");
         outputTable.put(defenderBase.getName(), writer);
-        writer.write(PrintUtil.csvThis(new String[]{
-            "Defender",
-            "DefQuick",
-            "DefCharge",
-            "DefCP",
-            "DefLevel",
-            "Attacker",
-            "AttQuick",
-            "AttCharge",
-            "AttCP",
-            "AttLevel",
-            "PrestigeGained",
-            "CombatTime",
-            "AttHpLeft",
-            "AttTotHp",
-            "AttHpLeft%",
-            "DefHpLeft",
-            "DefTotHp",
-            "DefHpLeft%",
-            "AttPower%",
-            "AttDPS",
-            "AttStrat"
-        }));
-        if(simulator instanceof MonteCarloFightSimulator){
-          writer.write(",");
-          writer.write(PrintUtil.csvThis(new String[]{
-            "Win%",
-            "Timeout%"
-          }));
-        }
-        if(OUTPUT_RANKING){
-          writer.write(",");
-          writer.write(PrintUtil.csvThis(new String[]{
-            "TimePower%",
-            "TotalPower%"
-          }));
-        }
-        writer.write("\r\n");
+        writeHeader(writer, simulator instanceof MonteCarloFightSimulator);
       }
       System.out.println("Calculating: " + defenderBase.getName() + "." + defenderQuick.getName() + "." + defenderCharge.getName());
       int currentDefLevel = minDefLevel;
@@ -481,7 +366,7 @@ public class RankingCalculator {
             writer.flush();
           }
         }
-        currentDefLevel += 5;
+        currentDefLevel += levelIncrement;
       }
     }
     Set<String> outputKeySet = outputTable.keySet();
@@ -491,79 +376,48 @@ public class RankingCalculator {
     }
   }
   
-  private static void writeFightResult(FileWriter writer, FightResult result) throws Exception {
-    CombatantResult attackerResult = result.getCombatant(0);
-    Pokemon attacker = attackerResult.getPokemon();
-    CombatantResult defenderResult = result.getCombatant(1);
-    Pokemon defender = defenderResult.getPokemon();
+
+  private static void writeHeader(FileWriter writer, boolean isMonteCarlo) throws Exception {
     writer.write(PrintUtil.csvThis(new String[]{
-        attacker.getBasePokemon().getName(),
-        attacker.getQuickMove().getName(),
-        attacker.getChargeMove().getName(),
-        "" + attackerResult.getCp(),
-        "" + ((double)attacker.getLevel())/10,
-        "" + result.getPrestige(),
-        "" + result.getTotalCombatTime(),
-        "" + attackerResult.getEndHp(),
-        "" + attackerResult.getStartHp(),
-        "" + (attackerResult.getEndHp()<1?"0":((double)attackerResult.getEndHp()*100)/attackerResult.getStartHp()),
-        "" + defenderResult.getCp(),
-        "" + ((double)defender.getLevel())/10,
-        "" + defenderResult.getEndHp(),
-        "" + defenderResult.getStartHp(),
-        "" + (defenderResult.getEndHp()<1?"0":((double)defenderResult.getEndHp()*100)/defenderResult.getStartHp()),
-        (result.getPower()*100) + "",
-        "" + attackerResult.getDps(),
-        attackerResult.getStrategy().name()
+        "Defender",
+        "DefQuick",
+        "DefCharge",
+        "DefCP",
+        "DefLevel",
+        "Attacker",
+        "AttQuick",
+        "AttCharge",
+        "AttCP",
+        "AttLevel",
+        "CombatTime",
+        "AttHpLeft",
+        "AttTotHp",
+        "DefHpLeft",
+        "DefTotHp",
+        "AttPower%",
+        "AttStrat"
     }));
+    if(isMonteCarlo){
+      writer.write(",");
+      writer.write(PrintUtil.csvThis(new String[]{
+        "Win%",
+        "Timeout%"
+      }));
+    }
     if(OUTPUT_RANKING){
       writer.write(",");
-      double timeToKill = ((double)defenderResult.getStartHp())/attackerResult.getDps();
-      double timePower = ((double)Formulas.MAX_COMBAT_TIME_MS)/(1000*timeToKill);
       writer.write(PrintUtil.csvThis(new String[]{
-          "" + timePower*100,
-          "" + Math.sqrt((timePower*result.getPower()))*100
+        "PrestigeGained",
+        "AttDPS",
+        "AttHpLeft%",
+        "DefHpLeft%",
+        "TimePower%",
+        "TotalPower%"
       }));
     }
     writer.write("\r\n");
   }
-
-  private static void writeDefenderFightResult(FileWriter writer, FightResult result) throws Exception {
-    CombatantResult attackerResult = result.getCombatant(0);
-    Pokemon attacker = attackerResult.getPokemon();
-    CombatantResult defenderResult = result.getCombatant(1);
-    Pokemon defender = defenderResult.getPokemon();
-    writer.write(PrintUtil.csvThis(new String[]{
-        defender.getBasePokemon().getName(),
-        defender.getQuickMove().getName(),
-        defender.getChargeMove().getName(),
-        "" + defender.getCp(),
-        "" + attackerResult.getCp(),
-        "" + ((double)attacker.getLevel())/10,
-        "" + result.getPrestige(),
-        "" + result.getTotalCombatTime(),
-        "" + attackerResult.getEndHp(),
-        "" + attackerResult.getStartHp(),
-        "" + (attackerResult.getEndHp()<1?"0":((double)attackerResult.getEndHp()*100)/attackerResult.getStartHp()),
-        "" + defenderResult.getEndHp(),
-        "" + defenderResult.getStartHp(),
-        "" + (defenderResult.getEndHp()<1?"0":((double)defenderResult.getEndHp()*100)/defenderResult.getStartHp()),
-        (result.getPower()*100) + "",
-        "" + attackerResult.getDps(),
-        attackerResult.getStrategy().name()
-    }));
-    if(OUTPUT_RANKING){
-      writer.write(",");
-      double timeToKill = ((double)defenderResult.getStartHp())/attackerResult.getDps();
-      double timePower = ((double)Formulas.MAX_COMBAT_TIME_MS)/(1000*timeToKill);
-      writer.write(PrintUtil.csvThis(new String[]{
-          "" + timePower*100,
-          "" + Math.sqrt((timePower*result.getPower()))*100
-      }));
-    }
-    writer.write("\r\n");
-  }
-
+  
   private static void writeFightResultDetailed(FileWriter writer, FightResult result) throws Exception {
     CombatantResult attackerResult = result.getCombatant(0);
     Pokemon attacker = attackerResult.getPokemon();
@@ -580,16 +434,12 @@ public class RankingCalculator {
         attacker.getChargeMove().getName(),
         "" + attacker.getCp(),
         "" + ((double)attacker.getLevel())/10,
-        "" + result.getPrestige(),
         "" + result.getTotalCombatTime(),
         "" + attackerResult.getEndHp(),
         "" + attackerResult.getStartHp(),
-        "" + (attackerResult.getEndHp()<1?"0":((double)attackerResult.getEndHp()*100)/attackerResult.getStartHp()),
         "" + defenderResult.getEndHp(),
         "" + defenderResult.getStartHp(),
-        "" + (defenderResult.getEndHp()<1?"0":((double)defenderResult.getEndHp()*100)/defenderResult.getStartHp()),
         (result.getPower()*100) + "",
-        "" + attackerResult.getDps(),
         attackerResult.getStrategy().name()
     }));
     if(result instanceof MonteCarloFightResult){
@@ -604,6 +454,10 @@ public class RankingCalculator {
       double timeToKill = ((double)defenderResult.getStartHp())/attackerResult.getDps();
       double timePower = ((double)Formulas.MAX_COMBAT_TIME_MS)/(1000*timeToKill);
       writer.write(PrintUtil.csvThis(new String[]{
+          "" + result.getPrestige(),
+          "" + attackerResult.getDps(),
+          "" + (attackerResult.getEndHp()<1?"0":((double)attackerResult.getEndHp()*100)/attackerResult.getStartHp()),
+          "" + (defenderResult.getEndHp()<1?"0":((double)defenderResult.getEndHp()*100)/defenderResult.getStartHp()),
           "" + timePower*100,
           "" + Math.sqrt((timePower*result.getPower()))*100
       }));

@@ -168,7 +168,7 @@ public class CombatantState {
         combatTime += time;
         timeSinceLastMove += time;
     }
-
+    
     public CombatantResult toResult(AttackStrategyType strategy, int actualCombatTime) {
         CombatantResult retval = new CombatantResult();
         retval.setStrategy(strategy);

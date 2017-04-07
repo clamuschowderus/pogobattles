@@ -13,18 +13,22 @@ public class DodgeAllHuman implements AttackStrategy {
 
     public static final int SECOND_ATTACK_DELAY = 1000;
     public static final int FIRST_ATTACK_TIME = 1600 - Formulas.START_COMBAT_TIME;
+    public static final int REAL_MIN_DEFENDER_DELAY = 1500;
     public static final int MIN_DEFENDER_DELAY_CAUTIOUS = 1500;
     public static final int MIN_DEFENDER_DELAY_REASONABLE = 1750;
     public static final int MIN_DEFENDER_DELAY_RISKY = 2000;
     public static final int MIN_DEFENDER_DELAY_RECKLESS = 2250;
+    public static final int MIN_DEFENDER_DELAY_DODGE_SPECIALS = 2500;
     public static final int CHARGE_REALIZATION_DELAY = 700; //Human reaction + time to swipe to dodge.
     public static final int HUMAN_REACTION_TIME = 250; //Average Human reaction time to visual stimulus.
+    
+    public int timeElapsed = Formulas.START_COMBAT_TIME; //used for the beginning of the battle only.
     
     public AttackStrategyType getType() {
         return type;
     }
-
-    public DodgeAllHuman(int extraDelay, AttackStrategyType type, int expectedDefenderDelay) {
+    
+    public DodgeAllHuman(int extraDelay, AttackStrategyType type, int expectedDefenderDelay){
         this.extraDelay = extraDelay;
         this.type = type;
         expectedMinDefDelay = expectedDefenderDelay;
@@ -39,18 +43,16 @@ public class DodgeAllHuman implements AttackStrategy {
         // dodge special if we can
         if (defenderState.getNextMove() != null && defenderState.getTimeToNextDamage() > 0
                 && !defenderState.isDodged()) {
-            if (defenderState.getTimeToNextDamage() <= Formulas.DODGE_WINDOW + extraDelay - HUMAN_REACTION_TIME) {
-                //if getTimeToNextDamage() is less than DODGE_WINDOW - HUMAN_REACTION_TIME, we've already seen the yellow flash, dodge immediately.
-                dodgedSpecial = defenderState.isNextMoveSpecial();
-                return new PokemonAttack(Move.DODGE_MOVE, extraDelay);
-            } else if (earliestNextDamageTime > attackerState.getPokemon().getChargeMove().getDuration() + extraDelay + CAST_TIME
+            if (earliestNextDamageTime > attackerState.getPokemon().getChargeMove().getDuration() + extraDelay + CAST_TIME
                     && attackerState.getCurrentEnergy() >= -1 * attackerState.getPokemon().getChargeMove().getEnergyDelta()) {
                 // we can sneak in a special attack
                 dodgedSpecial = false;
+                timeElapsed += attackerState.getPokemon().getChargeMove().getDuration() + extraDelay + CAST_TIME;
                 return new PokemonAttack(attackerState.getPokemon().getChargeMove(), extraDelay + CAST_TIME);
             } else if (earliestNextDamageTime > attackerState.getPokemon().getQuickMove().getDuration() + extraDelay) {
                 // we can sneak in a normal attack
                 dodgedSpecial = false;
+                timeElapsed += attackerState.getPokemon().getQuickMove().getDuration() + extraDelay;
                 return new PokemonAttack(attackerState.getPokemon().getQuickMove(), extraDelay);
             } else {
                 // We here have to define how much time the attacker will wait to dodge.
@@ -66,6 +68,7 @@ public class DodgeAllHuman implements AttackStrategy {
                   if(defenderState.getTimeToNextDamage() > realizationTime + attackerState.getPokemon().getQuickMove().getDuration()){
                     // we can sneak in a normal attack after realization
                     dodgedSpecial = false;
+                    timeElapsed += attackerState.getPokemon().getQuickMove().getDuration() + realizationTime;
                     return new PokemonAttack(attackerState.getPokemon().getQuickMove(), realizationTime);
                   }
                 }
@@ -77,6 +80,7 @@ public class DodgeAllHuman implements AttackStrategy {
                 }
 
                 dodgedSpecial = defenderState.isNextMoveSpecial();
+                timeElapsed += Move.DODGE_MOVE.getDuration() + Math.max(0, dodgeWait - Formulas.DODGE_WINDOW + HUMAN_REACTION_TIME);
                 return new PokemonAttack(Move.DODGE_MOVE,
                         Math.max(0, dodgeWait - Formulas.DODGE_WINDOW + HUMAN_REACTION_TIME));
             }
@@ -87,20 +91,24 @@ public class DodgeAllHuman implements AttackStrategy {
              dodgedSpecial
                 )) { // two conditions for firing specials, either we know it fits or we've just dodged a special.
             dodgedSpecial = false;
+            timeElapsed += attackerState.getPokemon().getChargeMove().getDuration() + extraDelay + CAST_TIME;
             return new PokemonAttack(attackerState.getPokemon().getChargeMove(), extraDelay + CAST_TIME);
         } else {
           if(defenderState.getNumAttacks()<2){ //early battle
             if (earliestNextDamageTime > attackerState.getPokemon().getQuickMove().getDuration() + extraDelay) {
               // we can sneak in a normal attack
               dodgedSpecial = false;
+              timeElapsed += attackerState.getPokemon().getQuickMove().getDuration() + extraDelay;
               return new PokemonAttack(attackerState.getPokemon().getQuickMove(), extraDelay);
             } else {
               dodgedSpecial = false; // early battle defender never throws specials
+              timeElapsed += Move.DODGE_MOVE.getDuration() + Math.max(0, earliestNextDamageTime - Formulas.DODGE_WINDOW + HUMAN_REACTION_TIME);
               return new PokemonAttack(Move.DODGE_MOVE,
-                  Math.max(0, earliestNextDamageTime - Formulas.DODGE_WINDOW));
+                  Math.max(0, earliestNextDamageTime - Formulas.DODGE_WINDOW + HUMAN_REACTION_TIME));
             }
           }else{
             dodgedSpecial = false;
+            timeElapsed += attackerState.getPokemon().getQuickMove().getDuration() + extraDelay;
             return new PokemonAttack(attackerState.getPokemon().getQuickMove(), extraDelay);
           }
         }
@@ -114,44 +122,41 @@ public class DodgeAllHuman implements AttackStrategy {
       
       int earliestNextDamageTime = -1;
       
-      if(defenderState.getNumAttacks() == 0){
-        //first defender attack
-        earliestNextDamageTime = FIRST_ATTACK_TIME;
-        //System.out.println("First Attack! " + attackerState.getActualCombatTime());
-        if(defenderState.getTimeToNextDamage() == Integer.MAX_VALUE){
-          // First Damage already registered but second attack not started yet.
-          // We have to backtrack the first attack to figure out when the second will hit, so we can dodge or squeeze in a quick.
-          earliestNextDamageTime = defenderState.getTimeToNextAttack() - defenderState.getNextMove().getDuration() + defenderState.getNextMove().getDamageWindowStart() + SECOND_ATTACK_DELAY;
-        }
-      }else if(defenderState.getNumAttacks() == 1){
-        //second defender attack
-        //System.out.println("Second Attack!");
-        if(defenderState.getTimeToNextDamage() == Integer.MAX_VALUE){
-          // Second attack registered but third hasn't.
-          // We have to backtrack the first attack to figure out when the second will hit, so we can dodge or squeeze in a quick.
-          earliestNextDamageTime = defenderState.getTimeToNextAttack() - defenderState.getNextMove().getDuration() + defenderState.getNextMove().getDamageWindowStart() + SECOND_ATTACK_DELAY;
+      if(defenderState.getNumAttacks() < 3){
+        //Beginning of battle
+        int firstDamageTime = FIRST_ATTACK_TIME + Formulas.START_COMBAT_TIME + defenderState.getNextMove().getDamageWindowStart();
+        int secondDamageTime = firstDamageTime + SECOND_ATTACK_DELAY;
+        int thirdDamageTime  = firstDamageTime + defenderState.getNextMove().getDuration() + expectedMinDefDelay;
+        
+        if(timeElapsed < firstDamageTime){
+          earliestNextDamageTime = firstDamageTime - timeElapsed;
+        }else if(timeElapsed < secondDamageTime){
+          earliestNextDamageTime = secondDamageTime - timeElapsed;
         }else{
-          earliestNextDamageTime = defenderState.getTimeToNextDamage();
+          earliestNextDamageTime = thirdDamageTime - timeElapsed;
         }
-      }else if(defenderState.getNumAttacks() == 2){
-        //third defender attack
-        earliestNextDamageTime = defenderState.getTimeToNextAttack() - defenderState.getNextMove().getDuration() - defenderState.getNextAttack().getDelay() + expectedMinDefDelay;
       }else{
         int chargeWindowStart = defenderState.getPokemon().getChargeMove().getDamageWindowStart();
         int quickWindowStart = defenderState.getPokemon().getQuickMove().getDamageWindowStart();
         
         int shortestWindowStart = chargeWindowStart<quickWindowStart?chargeWindowStart:quickWindowStart;
+        
+        int expectedDelayToUse = expectedMinDefDelay;
+        
+        if(expectedMinDefDelay == MIN_DEFENDER_DELAY_DODGE_SPECIALS){
+          expectedDelayToUse = REAL_MIN_DEFENDER_DELAY + (chargeWindowStart - shortestWindowStart); //never risk eating a charge attack!!
+        }
 
         if(defenderState.isDodged() || defenderState.getTimeToNextDamage() == Integer.MAX_VALUE){
           // current attack already dodged or damage already taken but next attack hasn't started yet.
           // We have to backtrack the current attack to figure out when the next one can possibly hit.
           
-          earliestNextDamageTime = defenderState.getTimeToNextAttack() + expectedMinDefDelay + shortestWindowStart;
+          earliestNextDamageTime = defenderState.getTimeToNextAttack() + expectedDelayToUse + shortestWindowStart;
           
         }else{
           int attackStartTime = defenderState.getTimeToNextAttack() - defenderState.getNextMove().getDuration();
         
-          earliestNextDamageTime = attackStartTime + shortestWindowStart - (defenderState.getNextAttack().getDelay() - expectedMinDefDelay);
+          earliestNextDamageTime = attackStartTime + shortestWindowStart - (defenderState.getNextAttack().getDelay() - expectedDelayToUse);
         }
         
       }

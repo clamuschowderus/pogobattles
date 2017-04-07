@@ -72,6 +72,8 @@ public class MonteCarloFightSimulator implements FightSimulator {
     } else {
         return  Math.max(SingleFightSimulator.MIN_POWER, Math.min(SingleFightSimulator.MAX_POWER,Math.log10(defenderPower/attackerPower)));
     }
-}
+  }
+  
+  
 
 }

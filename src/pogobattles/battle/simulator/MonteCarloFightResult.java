@@ -169,7 +169,17 @@ public class MonteCarloFightResult extends FightResult {
     int numTimeouts = 0;
     List<CombatResult> worstCombatResults = new ArrayList<CombatResult>();
     List<CombatResult> bestCombatResults = new ArrayList<CombatResult>();
+    
     for(FightResult sfr : singleFightResults){
+      if(sfr.getTotalCombatTime() < 0){
+        //discard invalid sim. There's a bug with Integer.MAX_VALUE used by the FightSimulator.
+        numFights--;
+        if(numFights == 0){
+          numFights = 1; //get at least one entry
+        }else{
+          continue;
+        }
+      }
       CombatantResult sfrAttRes = sfr.getCombatant(0);
       CombatantResult sfrDefRes = sfr.getCombatant(1);
       totalAttEndHp += sfrAttRes.getEndHp();
@@ -194,20 +204,23 @@ public class MonteCarloFightResult extends FightResult {
         bestCombatResults = sfr.getCombatResults();
       }
     }
-    super.setCombatResults(bestCombatResults); //use the best outcome as default
-    setWorstCombatResults(worstCombatResults);
-    super.setTotalCombatTime((int)(sumTotalCombatTime/numFights)); //average combat time
-    finalAttackerResult.setCombatTime(super.getTotalCombatTime());
-    finalDefenderResult.setCombatTime(super.getTotalCombatTime());
-    finalAttackerResult.setEndHp((int)(totalAttEndHp / numFights));
-    finalDefenderResult.setEndHp((int)(totalDefEndHp / numFights));
-    finalAttackerResult.setDamageDealt((int)totalAttDmgDealt / numFights);
-    finalDefenderResult.setDamageDealt((int)totalDefDmgDealt / numFights);
-    finalAttackerResult.setDps(1000.0f * (finalAttackerResult.getDamageDealt()) / super.getTotalCombatTime());
-    finalDefenderResult.setDps(1000.0f * (finalDefenderResult.getDamageDealt()) / super.getTotalCombatTime());
-    
-    setWinRatio(((double)numWins)/numFights);
-    setTimeoutRatio(((double)numTimeouts)/numFights);
+    if(numFights == 0){
+      //invalid sim
+    }else{
+      super.setCombatResults(bestCombatResults); //use the best outcome as default
+      setWorstCombatResults(worstCombatResults);
+      super.setTotalCombatTime((int)(sumTotalCombatTime/numFights)); //average combat time
+      finalAttackerResult.setCombatTime(super.getTotalCombatTime());
+      finalDefenderResult.setCombatTime(super.getTotalCombatTime());
+      finalAttackerResult.setEndHp((int)(totalAttEndHp / numFights));
+      finalDefenderResult.setEndHp((int)(totalDefEndHp / numFights));
+      finalAttackerResult.setDamageDealt((int)totalAttDmgDealt / numFights);
+      finalDefenderResult.setDamageDealt((int)totalDefDmgDealt / numFights);
+      finalAttackerResult.setDps(1000.0f * (finalAttackerResult.getDamageDealt()) / super.getTotalCombatTime());
+      finalDefenderResult.setDps(1000.0f * (finalDefenderResult.getDamageDealt()) / super.getTotalCombatTime());
+      setWinRatio(((double)numWins)/numFights);
+      setTimeoutRatio(((double)numTimeouts)/numFights);
+    }
     
     super.addCombatant(finalAttackerResult);
     super.addCombatant(finalDefenderResult);
