@@ -207,6 +207,12 @@ public class SingleFightSimulator implements FightSimulator {
         fightResult.setFightParameters(fight);
         fightResult.setPowerLog(getPower(fightResult));
         fightResult.setPower(Math.pow(10, fightResult.getPowerLog()));
+		CombatantResult attackerResult = fightResult.getCombatant(0);
+		CombatantResult defenderResult = fightResult.getCombatant(1);
+	    double timeToKill = ((double)defenderResult.getStartHp())/attackerResult.getDps();
+	    fightResult.setTimePower(((double)Formulas.MAX_COMBAT_TIME_MS)/(1000*timeToKill));
+	    fightResult.setTotalPower(Math.sqrt((fightResult.getTimePower()*fightResult.getPower())));
+
         return fightResult;
     }
     double getPower(FightResult result) {

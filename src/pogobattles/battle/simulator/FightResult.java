@@ -11,6 +11,8 @@ public class FightResult {
   private Fight fightParameters;
   private double power;
   private double powerLog;
+  private double timePower;
+  private double totalPower;
   private int prestige;
   public boolean isWin() {
     return win;
@@ -68,5 +70,17 @@ public class FightResult {
   }
   public CombatantResult getCombatant(int index){
     return combatants.get(index);
+  }
+  public double getTotalPower() {
+	return totalPower;
+  }
+  public void setTotalPower(double totalPower) {
+	this.totalPower = totalPower;
+  }
+  public void setTimePower(double timePower) {
+	this.timePower = timePower;
+  }
+  public double getTimePower(){
+	return timePower;
   }
 }

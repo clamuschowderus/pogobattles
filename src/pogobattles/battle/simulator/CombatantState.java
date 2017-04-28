@@ -128,7 +128,7 @@ public class CombatantState {
 
     int applyDefense(CombatResult r, int time) {
         int energyGain = Formulas.energyGain(r.getDamage());
-        currentEnergy = Math.max(0, Math.min(defender ? 200 : 100, currentEnergy + energyGain));
+        currentEnergy = Math.max(0, Math.min(defender ? Formulas.MAX_DEFENDER_ENERGY_POOL : Formulas.MAX_ATTACKER_ENERGY_POOL, currentEnergy + energyGain));
         currentHp -= r.getDamage();
         timeSinceLastMove += time;
         combatTime += r.getCombatTime();
@@ -154,7 +154,7 @@ public class CombatantState {
     int resetAttack(int time) {
         // energy gets subtracted at the very end, no energy gain
         int energyGain = nextMove.getEnergyDelta();
-        currentEnergy = Math.max(0, Math.min(defender ? 200 : 100, currentEnergy + energyGain));
+        currentEnergy = Math.max(0, Math.min(defender ? Formulas.MAX_DEFENDER_ENERGY_POOL : Formulas.MAX_ATTACKER_ENERGY_POOL, currentEnergy + energyGain));
         // reset things that happen in between attacks
         combatTime += time;
         timeSinceLastMove = 0; // -1 * delay;

@@ -20,6 +20,7 @@ import pogobattles.gamemaster.GameMaster;
 import pogobattles.gamemaster.Move;
 import pogobattles.gamemaster.ParserNew;
 import pogobattles.gamemaster.PrintUtil;
+import pogobattles.ranking.MatchupAnalyzer;
 import pogobattles.ranking.MovesetTable;
 import pogobattles.ranking.RankingCalculator;
 
@@ -45,13 +46,13 @@ public class Main {
     */
     
     FightSimulator simulator = new SingleFightSimulator(gameMaster);
-    FightSimulator monteCarloSimulator = new MonteCarloFightSimulator(gameMaster, 50);
+    FightSimulator monteCarloSimulator = new MonteCarloFightSimulator(gameMaster, 1000);
     
     List<String> defenders = new ArrayList<String>();
     /*
     defenders.add("Venusaur");
     defenders.add("Charizard");
-    defenders.add("Balstoise");
+    defenders.add("Blastoise");
     defenders.add("Beedrill");
     defenders.add("Butterfree");
     defenders.add("Pidgeot");
@@ -122,14 +123,14 @@ public class Main {
     defenders.add("Tauros");
     */
     defenders.add("Gyarados");
-    /*
     defenders.add("Lapras");
-    */
     defenders.add("Vaporeon");
     /*
     defenders.add("Jolteon");
     defenders.add("Flareon");
+    */
     defenders.add("Espeon");
+    /*
     defenders.add("Umbreon");
     defenders.add("Porygon2");
     defenders.add("Omastar");
@@ -192,7 +193,7 @@ public class Main {
     List<String> attackers = new ArrayList<String>();
     attackers.add("Venusaur");
     attackers.add("Charizard");
-    attackers.add("Balstoise");
+    attackers.add("Blastoise");
     attackers.add("Beedrill");
     attackers.add("Butterfree");
     attackers.add("Pidgeot");
@@ -315,18 +316,39 @@ public class Main {
     attackers.add("Hitmontop");
     attackers.add("Tyranitar");
 
-    String outputFolder = BASE_FOLDER + "CountersMaxHuman\\";
-    //checkAndCreateFolder(outputFolder);
-    //RankingCalculator.calculateAll(outputFolder, simulator, gameMaster, movesets, defenders, 300, 400);
-    //RankingCalculator.calculateAll(outputFolder, simulator, gameMaster, movesets, attackers, defenders, 300, 400);
+    String outputFolder = BASE_FOLDER + "MonteCarlo-CountersMax\\";
+    checkAndCreateFolder(outputFolder);
+    RankingCalculator.calculateAll(outputFolder, monteCarloSimulator, gameMaster, movesets, attackers, defenders, 300, 400);
     
-    //outputFolder = BASE_FOLDER + "Counters30\\";
+    //outputFolder = BASE_FOLDER + "MonteCarlo-CountersMaxBestPotions\\";
     //checkAndCreateFolder(outputFolder);
-    //RankingCalculator.calculateAll(outputFolder, simulator, gameMaster, movesets, defenders, 300, 300);
+    //RankingCalculator.calculateAllBest(outputFolder, monteCarloSimulator, gameMaster, movesets, attackers, defenders, 300, 400, RankingCalculator.CRITERIA_POTION_EFFICIENCY);
     
-    //outputFolder = BASE_FOLDER + "Counters20\\";
+    //outputFolder = BASE_FOLDER + "Counters30DodgeAllProRegularBlissey\\";
     //checkAndCreateFolder(outputFolder);
-    //RankingCalculator.calculateAll(outputFolder, simulator, gameMaster, movesets, defenders, 300, 200);
+    //RankingCalculator.calculateConsolidatedResultsByDefender(outputFolder, simulator, gameMaster, movesets, attackers, defenders, 300, 300, null);
+
+    //BasePokemon blissey = pokemonByName(gameMaster, "BLISSEY");
+    //blissey.setType2(18); //Making Blissey Normal/Fairy
+    //outputFolder = BASE_FOLDER + "Counters30DodgeAllProFairyBlissey\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateConsolidatedResultsByDefender(outputFolder, simulator, gameMaster, movesets, attackers, defenders, 300, 300, null);
+
+    //outputFolder = BASE_FOLDER + "MonteCarlo-CountersMaxBestWithNinja\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllBest(outputFolder, monteCarloSimulator, gameMaster, movesets, attackers, defenders, 300, 400, null);
+
+    //outputFolder = BASE_FOLDER + "MonteCarlo-Counters30\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAll(outputFolder, monteCarloSimulator, gameMaster, movesets, attackers, defenders, 300, 300);
+    
+    //outputFolder = BASE_FOLDER + "Counters35\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAll(outputFolder, simulator, gameMaster, movesets, attackers, defenders, 300, 350);
+    
+    //outputFolder = BASE_FOLDER + "MonteCarlo-Counters35\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAll(outputFolder, monteCarloSimulator, gameMaster, movesets, attackers, defenders, 300, 350);
     
     //outputFolder = BASE_FOLDER + "PrestigersMax\\";
     //checkAndCreateFolder(outputFolder);
@@ -396,25 +418,47 @@ public class Main {
     //checkAndCreateFolder(outputFolder);
     //RankingCalculator.calculateAllPrestigeLevelsRange(outputFolder, monteCarloSimulator, gameMaster, movesets, defenders, 15, 15, 15, 400, 15, 15, 15, 200, 390, false, 10);
 
-    outputFolder = BASE_FOLDER + "MonteCarlo-1000Prestige25-39\\";
-    checkAndCreateFolder(outputFolder);
-    RankingCalculator.calculateAllPrestigeLevelsRange(outputFolder, monteCarloSimulator, gameMaster, movesets, defenders, 15, 15, 15, 400, 15, 15, 15, 250, 390, false, 20);
+    //outputFolder = BASE_FOLDER + "MonteCarlo-1000PrestigeCP25-37\\";
+    //checkAndCreateFolder(outputFolder);
+    //RankingCalculator.calculateAllPrestigeLevelsRange(outputFolder, monteCarloSimulator, gameMaster, movesets, defenders, 15, 15, 15, 390, 15, 15, 15, 250, 370, false, 5);
 
     PokemonDataCreator creator = new PokemonDataCreator(gameMaster);
-    BasePokemon attBase = pokemonByName(gameMaster, "ELECTRODE");
-    Move attQm = moveByName(gameMaster, "VOLT_SWITCH");
-    Move attCm = moveByName(gameMaster, "HYPER_BEAM");
-    BasePokemon defBase = pokemonByName(gameMaster, "DRAGONITE");
-    Move defQm = moveByName(gameMaster, "DRAGON_BREATH");
-    Move defCm = moveByName(gameMaster, "DRAGON_CLAW");
-    Pokemon attacker = creator.createPokemon(attBase, 235, 15, 15, 15, attQm, attCm);
-    Pokemon defender = creator.createPokemon(defBase, 250, 15, 15, 15, defQm, defCm);
-    MonteCarloFightResult result = (MonteCarloFightResult)monteCarloSimulator.calculateAttackDPS(attacker, defender, AttackStrategyType.DODGE_ALL_CAUTIOUS_HUMAN, AttackStrategyType.DEFENSE_RANDOM);
+    BasePokemon attBase = pokemonByName(gameMaster, "FLAREON");
+    Move attQm = moveByName(gameMaster, "FIRE_SPIN");
+    Move attCm = moveByName(gameMaster, "OVERHEAT");
+    BasePokemon defBase = pokemonByName(gameMaster, "BLISSEY");
+    Move defQm = moveByName(gameMaster, "ZEN_HEADBUTT");
+    Move defCm = moveByName(gameMaster, "DAZZLING_GLEAM");
+    Pokemon attacker = creator.createPokemon(attBase, 300, 15, 15, 15, attQm, attCm);
+    System.out.println(attacker.getCp());
+    Pokemon defender = creator.createPokemon(defBase, 390, 15, 15, 15, defQm, defCm);
+    MonteCarloFightResult result = (MonteCarloFightResult)monteCarloSimulator.calculateAttackDPS(attacker, defender, AttackStrategyType.DODGE_ALL_RECKLESS_HUMAN, AttackStrategyType.DEFENSE_RANDOM);
     //FightResult result = simulator.calculateAttackDPS(attacker, defender, AttackStrategyType.DODGE_SPECIALS_HUMAN, AttackStrategyType.DEFENSE_RANDOM);
     OutputStreamWriter writer = new OutputStreamWriter(System.out);
     System.out.println();
     PrintUtil.printFightResult(writer, result);
     writer.flush();
+
+    MatchupAnalyzer analyzer = new MatchupAnalyzer(attacker, defender);
+    
+    System.out.println("\r\nMatchup Analyzer:");
+    System.out.println("Att Quick: " + attacker.getQuickMove().getName() + ". DWS: " + attacker.getQuickMove().getDamageWindowStart() + ". Duration: " + attacker.getQuickMove().getDuration());
+    System.out.println("Att Charge: " + attacker.getChargeMove().getName() + ". DWS: " + attacker.getChargeMove().getDamageWindowStart() + ". Duration: " + attacker.getChargeMove().getDuration());
+    System.out.println("Def Quick: " + defender.getQuickMove().getName() + ". DWS: " + defender.getQuickMove().getDamageWindowStart() + ". Duration: " + defender.getQuickMove().getDuration());
+    System.out.println("Def Charge: " + defender.getChargeMove().getName() + ". DWS: " + defender.getChargeMove().getDamageWindowStart() + ". Duration: " + defender.getChargeMove().getDuration());
+    System.out.println("Charge move: "+ analyzer.getChargeStrategy().name());
+    int safestWeaveQuicks = analyzer.getSafestQuickPerWeave();
+    int safestQuicksToAvoidCharge = analyzer.getQuickPerWeaveToAvoidCharge();
+    System.out.println("Safest weave: " + safestWeaveQuicks);
+    System.out.println("Charge safe weave: " + safestQuicksToAvoidCharge);
+    System.out.println("Quick to Charge: " + analyzer.getQuickToCharge());
+    System.out.println("Charge to Charge: " + analyzer.getChargeToCharge());
+    System.out.println("+1 quick risks:");
+    System.out.println("- quickToQuick: " + analyzer.getQuickToQuickRisk(safestWeaveQuicks+1));
+    System.out.println("- quickToCharge: " + analyzer.getQuickToChargeRisk(safestWeaveQuicks+1));
+    System.out.println("- chargeToQuick: " + analyzer.getChargeToQuickRisk(safestWeaveQuicks+1));
+    System.out.println("- chargeToCharge: " + analyzer.getChargeToChargeRisk(safestWeaveQuicks+1));
+    
 
   }
   

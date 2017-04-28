@@ -15,6 +15,8 @@ public class Formulas {
     public static final int MAX_COMBAT_TIME_MS = 100000;
     public static final int START_COMBAT_TIME = 700;
     public static final int DODGE_WINDOW = 700;
+    public static final int MAX_DEFENDER_ENERGY_POOL = 100;
+    public static final int MAX_ATTACKER_ENERGY_POOL = 100;
     //private static final Random r = new Random();
 
     public static int getCurrentHP(int baseStam, int indStam, double cpm) {

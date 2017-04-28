@@ -5,14 +5,12 @@ import java.util.Random;
 import pogobattles.battle.simulator.CombatantState;
 import pogobattles.battle.simulator.Formulas;
 import pogobattles.gamemaster.Move;
-import pogobattles.ranking.MatchupAnalyzer;
 
-public class DodgeAllHuman implements AttackStrategy {
+public class DodgeWeave implements AttackStrategy {
     private int extraDelay;
     private boolean dodgedSpecial = false;
     private AttackStrategyType type;
     private int expectedMinDefDelay = MIN_DEFENDER_DELAY_REASONABLE;
-    private int toSpecial = 0;
     public static final int CAST_TIME = 0;
 
     public static final int SECOND_ATTACK_DELAY = 1000;
@@ -22,18 +20,26 @@ public class DodgeAllHuman implements AttackStrategy {
     public static final int MIN_DEFENDER_DELAY_REASONABLE = 1750;
     public static final int MIN_DEFENDER_DELAY_RISKY = 2000;
     public static final int MIN_DEFENDER_DELAY_RECKLESS = 2250;
-    public static final int MIN_DEFENDER_DELAY_MAX_RISK = 2500;
+    public static final int MIN_DEFENDER_DELAY_EAT_IT_ALL = 2500;
     public static final int MIN_DEFENDER_DELAY_DODGE_SPECIALS = 10000;
     //public static final int MIN_DEFENDER_DELAY_RANDOM = 0;
     //public static final int MIN_DEFENDER_DELAY_RANDOM_SPECIALS_ONLY = -1;
-    public static final int CHARGE_REALIZATION_DELAY = 1000; //Human reaction + time to swipe to dodge.
-    public static final int HUMAN_REACTION_TIME = 300; //Average Human reaction time to visual stimulus.
+    public static final int CHARGE_REALIZATION_DELAY = 700; //Human reaction + time to swipe to dodge.
+    public static final int HUMAN_REACTION_TIME = 250; //Average Human reaction time to visual stimulus.
     
     public int timeElapsed = Formulas.START_COMBAT_TIME; //used for the beginning of the battle only.
     
     private boolean ninjaDodgeEnabled = false;
     
-    private ChargeAttackStrategyType optimalChargeStrategy = ChargeAttackStrategyType.NEVER_FITS;
+    private boolean firstAttack = false;
+    
+    private FireSpecialStrategyType chargeStrategy = null;
+    
+    private boolean limitWeaveRiskBySpecials = false;
+    
+    private int specialCushion = 0;
+    
+    private int quickPerWeave = 0;
     
     //used for random strategy
     //private Random r = new Random();
@@ -45,34 +51,41 @@ public class DodgeAllHuman implements AttackStrategy {
         return type;
     }
     
-    public DodgeAllHuman(int extraDelay, AttackStrategyType type, int expectedDefenderDelay){
-    	this(extraDelay, type, expectedDefenderDelay, false);
-    }
-    	
-    public DodgeAllHuman(int extraDelay, AttackStrategyType type, int expectedDefenderDelay, boolean ninjaDodge){
+    public DodgeWeave(int extraDelay, AttackStrategyType type, int expectedDefenderDelay, boolean limitWeaveRiskBySpecials, boolean alternateWeave){
       this.extraDelay = extraDelay;
       this.type = type;
       expectedMinDefDelay = expectedDefenderDelay;
       dodgedSpecial = false;
-      this.ninjaDodgeEnabled = ninjaDodge;
+      ninjaDodgeEnabled = false;
+      firstAttack = true;
+      chargeStrategy = null;
+      this.limitWeaveRiskBySpecials = limitWeaveRiskBySpecials;
+    }
+    
+    public boolean isRandomStrategy(){
+      return expectedMinDefDelay <= 0;
     }
     
     public PokemonAttack nextAttack(CombatantState attackerState, CombatantState defenderState) {
       
+        if(firstAttack){
+          calculateWeave(attackerState, defenderState);
+          firstAttack = false;
+        }
+      
         int earliestNextDamageTime = calculateEarliestNextDamageTime(attackerState, defenderState);
-        
+      
         // dodge special if we can
-        if (defenderState.getNextMove() != null && defenderState.getTimeToNextDamage() > 0  
+        if (defenderState.getNextMove() != null && defenderState.getTimeToNextDamage() > 0
                 && !defenderState.isDodged()) {
-            if (defenderState.getTimeToNextDamage() < Formulas.DODGE_WINDOW - (HUMAN_REACTION_TIME + extraDelay) 
-                && ninjaDodgeEnabled){ //ninja dodge!
+            if (earliestNextDamageTime < Formulas.DODGE_WINDOW + HUMAN_REACTION_TIME + extraDelay 
+                && ninjaDodgeEnabled && !isRandomStrategy()){ //ninja dodge!
               dodgedSpecial = defenderState.isNextMoveSpecial();
               timeElapsed += Move.DODGE_MOVE.getDuration() + extraDelay;
               return new PokemonAttack(Move.DODGE_MOVE, extraDelay);
-            } else if ((earliestNextDamageTime > attackerState.getPokemon().getChargeMove().getDuration() + extraDelay + CAST_TIME
-            		|| (optimalChargeStrategy != ChargeAttackStrategyType.ALWAYS_FITS && toSpecial > attackerState.getPokemon().getChargeMove().getDuration() + extraDelay + CAST_TIME))
-            		&& attackerState.getCurrentEnergy() >= -1 * attackerState.getPokemon().getChargeMove().getEnergyDelta()) {
-                // we can sneak in a special attack, or we don't want to waste energy
+            } else if (earliestNextDamageTime > attackerState.getPokemon().getChargeMove().getDuration() + extraDelay + CAST_TIME
+                    && attackerState.getCurrentEnergy() >= -1 * attackerState.getPokemon().getChargeMove().getEnergyDelta()) {
+                // we can sneak in a special attack
                 dodgedSpecial = false;
                 timeElapsed += attackerState.getPokemon().getChargeMove().getDuration() + extraDelay + CAST_TIME;
                 return new PokemonAttack(attackerState.getPokemon().getChargeMove(), extraDelay + CAST_TIME);
@@ -81,12 +94,6 @@ public class DodgeAllHuman implements AttackStrategy {
                 dodgedSpecial = false;
                 timeElapsed += attackerState.getPokemon().getQuickMove().getDuration() + extraDelay;
                 return new PokemonAttack(attackerState.getPokemon().getQuickMove(), extraDelay);
-//            } else if (toSpecial > attackerState.getPokemon().getChargeMove().getDuration() + extraDelay + CAST_TIME
-//                    && attackerState.getCurrentEnergy() >= -1 * attackerState.getPokemon().getChargeMove().getEnergyDelta()){
-//                // fire a special attack after a quick move
-//                dodgedSpecial = false;
-//                timeElapsed += attackerState.getPokemon().getChargeMove().getDuration() + extraDelay + CAST_TIME;
-//                return new PokemonAttack(attackerState.getPokemon().getChargeMove(), extraDelay + CAST_TIME);
             } else {
               // We here have to define how much time the attacker will wait to dodge.
               // If we're waiting for a quick attack but we get a long windup charge instead,
@@ -111,7 +118,7 @@ public class DodgeAllHuman implements AttackStrategy {
               if(dodgeWait > 1000000 || dodgeWait < 0){
                 dodgeWait = 0;
               }
-              
+
               dodgedSpecial = defenderState.isNextMoveSpecial();
               timeElapsed += Move.DODGE_MOVE.getDuration() + Math.max(0, dodgeWait - Formulas.DODGE_WINDOW + HUMAN_REACTION_TIME);
               return new PokemonAttack(Move.DODGE_MOVE,
@@ -134,13 +141,8 @@ public class DodgeAllHuman implements AttackStrategy {
           if (attackerState.getCurrentEnergy() >= -1 * attackerState.getPokemon().getChargeMove().getEnergyDelta() &&
               (earliestNextDamageTime > attackerState.getPokemon().getChargeMove().getDuration() + extraDelay + CAST_TIME
                   ||
-               (optimalChargeStrategy != ChargeAttackStrategyType.ALWAYS_FITS && toSpecial > attackerState.getPokemon().getChargeMove().getDuration() + extraDelay + CAST_TIME)
-                  ||
                dodgedSpecial
-                )) { // three conditions for firing specials, 
-        	  			// - we know it fits or;
-        	            // - it fits after right after the last defender's move hit but before its next charge (in case it's a charge)
-        	            // - we've just dodged a special.
+                )) { // two conditions for firing specials, either we know it fits or we've just dodged a special.
               dodgedSpecial = false;
               timeElapsed += attackerState.getPokemon().getChargeMove().getDuration() + extraDelay + CAST_TIME;
               return new PokemonAttack(attackerState.getPokemon().getChargeMove(), extraDelay + CAST_TIME);
@@ -159,11 +161,6 @@ public class DodgeAllHuman implements AttackStrategy {
     private int calculateEarliestNextDamageTime(CombatantState attackerState, CombatantState defenderState){
       
       int earliestNextDamageTime = -1;
-      
-      if(timeElapsed == Formulas.START_COMBAT_TIME){
-    	  MatchupAnalyzer analyzer = new MatchupAnalyzer(attackerState.getPokemon(), defenderState.getPokemon());
-    	  optimalChargeStrategy = analyzer.getChargeStrategy();
-      }
       
       if(defenderState.getNumAttacks() < 3){
         //Beginning of battle
@@ -202,7 +199,6 @@ public class DodgeAllHuman implements AttackStrategy {
           earliestNextDamageTime = attackStartTime + shortestWindowStart - (defenderState.getNextAttack().getDelay() - expectedDelayToUse);
         }
         
-        toSpecial = earliestNextDamageTime - expectedDelayToUse + REAL_MIN_DEFENDER_DELAY + (chargeWindowStart - shortestWindowStart);
       }
       
 //      if(earliestNextDamageTime < 0){
@@ -210,9 +206,65 @@ public class DodgeAllHuman implements AttackStrategy {
 //        earliestNextDamageTime = 0;
 //      }
       
-      
       return earliestNextDamageTime;
 
+    }
+    
+    public void calculateWeave(CombatantState attackerState, CombatantState defenderState){
+      Move defQuick = defenderState.getPokemon().getQuickMove();
+      Move defCharge = defenderState.getPokemon().getChargeMove();
+      Move attQuick = attackerState.getPokemon().getQuickMove();
+      Move attCharge = attackerState.getPokemon().getChargeMove();
+      
+      int afterQuick = defQuick.getDamageWindowEnd() - defQuick.getDamageWindowStart();
+      int afterCharge = defCharge.getDamageWindowEnd() - defCharge.getDamageWindowStart();
+      
+      int riskTime = expectedMinDefDelay - REAL_MIN_DEFENDER_DELAY; // amount of time we're willing to risk.
+      
+      //How much longer we have in our weave cycle when the next defender attack is a charge.
+      specialCushion = defCharge.getDamageWindowStart() - defQuick.getDamageWindowStart(); 
+      
+      if(specialCushion < riskTime){ // We're risking more than our charge cushion.
+        //risking eating specials without dodging.
+        if(limitWeaveRiskBySpecials){ // Take risks as long as it doesn't result in eating a special
+          expectedMinDefDelay = Math.max(REAL_MIN_DEFENDER_DELAY, REAL_MIN_DEFENDER_DELAY + specialCushion);
+        }
+      }
+      
+      if(specialCushion < 0){
+        specialCushion = 0;
+      }
+
+      int fromQuickToCharge = afterQuick + defCharge.getDamageWindowStart();
+      int fromChargeToQuick = afterCharge + defQuick.getDamageWindowStart();
+      
+      int minAfterQuick = Math.min(defQuick.getDuration(), fromQuickToCharge);
+      
+      int timeToFireCharge = attCharge.getDuration() + HUMAN_REACTION_TIME;
+      
+      if(timeToFireCharge < minAfterQuick + expectedMinDefDelay + Formulas.DODGE_WINDOW){
+        // charge fits.
+        chargeStrategy = FireSpecialStrategyType.WHEN_FITS;
+      }else{
+        if(timeToFireCharge < fromQuickToCharge + expectedMinDefDelay + Formulas.DODGE_WINDOW){
+          // fits after a quick if the defender will fire a charge;
+          chargeStrategy = FireSpecialStrategyType.AFTER_QUICK;
+          // after quick strategy will use special cushion to determine if special can be fired.
+        }else{
+          // fire only after defender specials;
+          chargeStrategy = FireSpecialStrategyType.AFTER_SPECIAL;
+        }
+      }
+      
+      int timeToFireQuicks = expectedMinDefDelay + minAfterQuick - Move.DODGE_MOVE.getDuration();
+      
+      quickPerWeave = timeToFireQuicks/attQuick.getDuration();    
+    }
+    
+    public enum FireSpecialStrategyType{
+      WHEN_FITS,
+      AFTER_QUICK,
+      AFTER_SPECIAL
     }
 
 }

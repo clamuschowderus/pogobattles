@@ -594,9 +594,12 @@ public class PrintUtil {
       out.write(MessageFormat.format("{0}: {1} - {2}" + (results.getAttackMove().getMoveId() == Move.DODGE_ID?"":" Dmg: {3}") + "\r\n", new Object[]{100000 - results.getCurrentTime(), results.getAttacker().getBasePokemon().getName(), results.getAttackMove().getName(), results.getDamage()}));
     }
     if(result instanceof MonteCarloFightResult){
-      for(CombatResult results : ((MonteCarloFightResult)result).getWorstCombatResults()){
+      MonteCarloFightResult mcfr = (MonteCarloFightResult)result;
+      for(CombatResult results : mcfr.getWorstCombatResults()){
         out.write(MessageFormat.format("{0}: {1} - {2}" + (results.getAttackMove().getMoveId() == Move.DODGE_ID?"":" Dmg: {3}") + "\r\n", new Object[]{100000 - results.getCurrentTime(), results.getAttacker().getBasePokemon().getName(), results.getAttackMove().getName(), results.getDamage()}));
       }
+      
+      out.write("\r\nWin%: " + mcfr.getWinRatio()*100+".\r\n");
     }
     
   }

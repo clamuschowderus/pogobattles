@@ -48,6 +48,11 @@ public class MonteCarloFightSimulator implements FightSimulator {
     mcfr.calculateAllResults();
     mcfr.setPowerLog(getPower(mcfr));
     mcfr.setPower(Math.pow(10, mcfr.getPowerLog()));
+	CombatantResult attackerResult = mcfr.getCombatant(0);
+	CombatantResult defenderResult = mcfr.getCombatant(1);
+    double timeToKill = ((double)defenderResult.getStartHp())/attackerResult.getDps();
+    mcfr.setTimePower(((double)Formulas.MAX_COMBAT_TIME_MS)/(1000*timeToKill));
+    mcfr.setTotalPower(Math.sqrt((mcfr.getTimePower()*mcfr.getPower())));
     return mcfr;
   }
 
